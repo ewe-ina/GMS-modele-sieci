@@ -62,45 +62,92 @@ void Barabasi_Ravasz_Vicsek()
 		}
 	}
 	printf("Liczba krawedzi: %i\n", m);
+
+	distanceMatrix = createMatrix();
+	//if (distanceMatrix != NULL)
+	//	printf("\n%i\n", *distanceMatrix[6,6]);
+	printMatrix(distanceMatrix);
+	deleteMatrix(distanceMatrix);
 		
 }
 
-	void Lu_Su_Guo()
+void Lu_Su_Guo()
+{
+	printf("Lu-Su-Guo\n");
+}
+
+void Simplical()
+{
+	printf("Simplical\n");
+}
+
+void Wzrostowo_iteracyjny()
+{
+	printf("Wzrostowo-iteracyjny\n");
+}
+
+void DCN()
+{
+	printf("DCN\n");
+}
+
+void GFG()
+{
+	printf("GFG\n");
+}
+void Kronecker()
+{
+	printf("Kronecker\n");
+}
+
+int** createMatrix() // moze zainicjowac wartosciami -1?
+{
+	int** matrix = (int**)calloc(allVertex, sizeof(int*));
+	if (matrix != NULL)
 	{
-		printf("Lu-Su-Guo\n");
+		for (int i = 0; i < allVertex; ++i)
+			matrix[i] = (int*)calloc(allVertex, sizeof(int));
 	}
 
-	void Simplical()
+	for (int i = 0; i < allVertex; i++)
 	{
-		printf("Simplical\n");
+		for (int j = 0; j < allVertex; j++)
+		{
+			
+			if (matrix != NULL && *matrix != NULL)
+			{
+			//printf("[i,j] = [%i,%i]\n", i, j);
+			*matrix[i, j] = -1;
+			}
+		}
 	}
 
-	void Wzrostowo_iteracyjny()
-	{
-		printf("Wzrostowo-iteracyjny\n");
-	}
+	return matrix;
+}
 
-	void DCN()
+void deleteMatrix(int** matrix)
+{
+	if (matrix != NULL)
 	{
-		printf("DCN\n");
+		for (int i = 0; i < allVertex; ++i)
+			free(matrix[i]);
+		free(matrix);
 	}
-
-	void GFG()
-	{
-		printf("GFG\n");
-	}
-	void Kronecker()
-	{
-		printf("Kronecker\n");
-	}
+}
 
 
 // POMOCNICZE
-void printMatrix(int **Matrix)
+void printMatrix(int** matrix)
 {
-    for(int i=0; i<allVertex; i++) {
-        for(int j=0;j<allVertex; j++)
-            printf("%3i",Matrix[i][j]);
-        printf("\n");
-    }
+	if (matrix != NULL)
+	{
+		for (int i = 0; i < allVertex; i++)
+		{
+			for (int j = 0; j < allVertex; j++)
+			{
+				printf("%3i", *matrix[i, j]);
+			}
+			printf("\n");
+		}
+	}
 }

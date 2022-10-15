@@ -2,6 +2,8 @@
 #define FUNCTIONS_H
 
 int allVertex;
+int** distanceMatrix;  // ktora na poczatku jest zwykla macieza sasiedztwa
+int** indexMatrix;  // identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty
 
 void getModel(int model);
 
@@ -13,7 +15,10 @@ void DCN();
 void GFG();
 void Kronecker();
 
+int** createMatrix();
+void deleteMatrix(int** matrix);
+
 // POMOCNICZE
-void printMatrix(int** Matrix);
+void printMatrix(int** matrix);
 
 #endif // !FUNCTIONS_H
