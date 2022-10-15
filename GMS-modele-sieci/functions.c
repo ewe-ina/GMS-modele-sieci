@@ -117,7 +117,7 @@ int** createMatrix() // moze zainicjowac wartosciami -1?
 			if (matrix != NULL && *matrix != NULL)
 			{
 			//printf("[i,j] = [%i,%i]\n", i, j);
-			*matrix[i, j] = -1;
+			matrix[i][j] = -1;
 			}
 		}
 	}
@@ -145,7 +145,7 @@ void printMatrix(int** matrix)
 		{
 			for (int j = 0; j < allVertex; j++)
 			{
-				printf("%3i", *matrix[i, j]);
+				printf("%3i", matrix[i][j]);
 			}
 			printf("\n");
 		}
