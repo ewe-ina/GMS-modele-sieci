@@ -10,7 +10,7 @@
  * 
  * WYJŒCIE
  * W kolejnych liniach.
- * Suma wszystkich odleg³oœci grafu, który powsta³ z modelu.
+ * Suma wszystkich odleg³oœci grafu, który powsta³ z modelu. (czyli liczba krawêdzi?)
  * 
  * Oblicz sumê wszystkich odleg³oœci w grafach powsta³ych za pomoc¹ modeli przedstawionych na wyk³adzie 
  * Uwaga ka¿dy model musi generowaæ sieæ, tzn. jakakolwiek reprezentacja grafu ma znajdowaæ siê w pamiêci, 
@@ -26,6 +26,7 @@
  * 6) Kronecker (parametrami modelu s¹ potêga oraz graf zapisany za pomoc¹ macierzy s¹siedztwa od lewej do prawej bez spacji).
  *   (patrz silny produkt dwóch grafów z ostatniego wyk³adu, zdefiniuj potêgê grafow¹ dla silnego produktu to jest G[x]G[x]G[x]..[x]G).
 */
+
 
 int main()
 {

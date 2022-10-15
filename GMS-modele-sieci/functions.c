@@ -33,10 +33,37 @@ void getModel(int model)
 	}
 }
 
-	void Barabasi_Ravasz_Vicsek()
+void Barabasi_Ravasz_Vicsek()
+{
+	printf("Barabasi-Ravasz-Vicsek\n");
+	int k = 0;
+	scanf_s("%i", &k);
+	printf("k = %i\n", k);
+
+	allVertex = 1; // wêze³ w kroku 0
+
+	// LICZBA WIERZCHO£KÓW 
+	if (k > 0)
 	{
-		printf("Barabasi-Ravasz-Vicsek\n");
+		for (int i = 0; i < k; i++)
+			allVertex = allVertex * 3;
 	}
+	printf("Liczba wierzcholkow: %i\n", allVertex);
+
+	// LICZBA KRAWEÊDZI                 
+	int m = 0;
+	if (k > 0)
+	{
+		int j = 1;
+		for (int i = 0; i < k; i++) 
+		{
+			j = j * 2;
+			m = m * 3 + j;
+		}
+	}
+	printf("Liczba krawedzi: %i\n", m);
+		
+}
 
 	void Lu_Su_Guo()
 	{
@@ -66,3 +93,14 @@ void getModel(int model)
 	{
 		printf("Kronecker\n");
 	}
+
+
+// POMOCNICZE
+void printMatrix(int **Matrix)
+{
+    for(int i=0; i<allVertex; i++) {
+        for(int j=0;j<allVertex; j++)
+            printf("%3i",Matrix[i][j]);
+        printf("\n");
+    }
+}
