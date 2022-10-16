@@ -35,10 +35,15 @@ void getModel(int model)
 
 void Barabasi_Ravasz_Vicsek()
 {
+#ifdef DEBUG
 	printf("Barabasi-Ravasz-Vicsek\n");
+#endif // DEBUG
+
 	int k = 0;
 	scanf_s("%i", &k);
+#ifdef DEBUG
 	printf("k = %i\n", k);
+#endif // DEBUG
 
 	allVertex = 1; // wêze³ w kroku 0
 
@@ -48,7 +53,10 @@ void Barabasi_Ravasz_Vicsek()
 		for (int i = 0; i < k; i++)
 			allVertex = allVertex * 3;
 	}
+#ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
+#endif // DEBUG
+
 
 	// LICZBA KRAWEÊDZI                 
 	int m = 0;
@@ -61,7 +69,10 @@ void Barabasi_Ravasz_Vicsek()
 			m = m * 3 + j;
 		}
 	}
+#ifdef DEBUG
 	printf("Liczba krawedzi: %i\n", m);
+#endif // DEBUG
+
 
 	distanceMatrix = createMatrix();
 	indexMatrix = createMatrix();
@@ -71,8 +82,92 @@ void Barabasi_Ravasz_Vicsek()
 	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
 
+	// krok 0
+	int i = 0;
+	int j = 0;
+	int copyVertex = 0;
+	int copyIndex_i = 0;
+	int copyIndex_j = 0;
+	int prevCopyIndex = 0;
+	//int prevCopyIndex_j = 0;
 
-	printMatrix(distanceMatrix);
+	// krok 1
+	if (k > 0)
+	{
+		for (i = 1; i < 3; i++)
+		{
+			distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+			indexMatrix[i][j] = i;
+			indexMatrix[j][i] = j;
+		}
+		copyVertex = 3;
+	}
+
+	// krok >=2
+	if (k > 1)
+	{
+		for (int step = 2; step <= k; step++)
+		{
+			for (int i = 0; i < copyVertex; i++)
+			{
+				for (int j = 0; j < copyVertex; j++)
+				{
+					if (distanceMatrix[i][j] == 1)
+					{
+						copyIndex_i = i + copyVertex;
+						copyIndex_j = j + copyVertex;
+						distanceMatrix[copyIndex_i][copyIndex_j] = 1;
+						indexMatrix[copyIndex_i][copyIndex_j] = 1;
+
+						if (j > prevCopyIndex && distanceMatrix[0][j] == 1)
+						{
+							distanceMatrix[0][copyIndex_j] = distanceMatrix[copyIndex_j][0] = 1;
+							indexMatrix[0][copyIndex_j] = 0;
+							indexMatrix[copyIndex_j][0] = copyIndex_j;
+						}
+
+						copyIndex_i += copyVertex;
+						copyIndex_j += copyVertex;
+						distanceMatrix[copyIndex_i][copyIndex_j] = 1;
+						indexMatrix[copyIndex_i][copyIndex_j] = 1;
+
+						if (j > prevCopyIndex && distanceMatrix[0][j] == 1)
+						{
+							distanceMatrix[0][copyIndex_j] = distanceMatrix[copyIndex_j][0] = 1;
+							indexMatrix[0][copyIndex_j] = 0;
+							indexMatrix[copyIndex_j][0] = copyIndex_j;
+						}
+					}
+				}
+			}
+
+			// dolne z korzeniem - DONE WYZEJ
+			// czyli te, które do³o¿one w poprzednim kroku by³y po³¹czone z korzeniem, z przesuniêciem o copyVertex i 2*copyVertex
+			// czyli zaczynami nie od 0, a od prevCopyIndex;
+
+
+			// na koñcu pêtli
+			prevCopyIndex = copyVertex;
+			copyVertex *= 3;
+		}
+
+		// przejœæ po ca³ej distanceMartix, jeœli nie ma krawêdzi oraz i != j to nieskoñczonoœæ
+		for (int i = 0; i < allVertex; i++)
+		{
+			for (int j = 0; j < allVertex; j++)
+			{
+				if (i != j && distanceMatrix[i][j] == 0)
+				{
+					distanceMatrix[i][j] = MAXVAL;
+				}
+			}
+		}
+	}
+	
+
+
+
+	//printMatrix(distanceMatrix);
 	
 	Floyd_Warshall();
 
@@ -82,33 +177,52 @@ void Barabasi_Ravasz_Vicsek()
 
 void Lu_Su_Guo()
 {
+#ifdef DEBUG
 	printf("Lu-Su-Guo\n");
+#endif // DEBUG
+
+	
 	// test 1 6 -> JEST OK
 	// matrixForTest();
 }
 
 void Simplical()
 {
+#ifdef DEBUG
 	printf("Simplical\n");
+#endif // DEBUG
+	
 }
 
 void Wzrostowo_iteracyjny()
 {
+#ifdef DEBUG
 	printf("Wzrostowo-iteracyjny\n");
+#endif // DEBUG
+	
 }
 
 void DCN()
 {
+#ifdef DEBUG
 	printf("DCN\n");
+#endif // DEBUG
+	
 }
 
 void GFG()
 {
+#ifdef DEBUG
 	printf("GFG\n");
+#endif // DEBUG
+	
 }
 void Kronecker()
 {
+#ifdef DEBUG
 	printf("Kronecker\n");
+#endif // DEBUG
+
 }
 
 int** createMatrix() // moze zainicjowac wartosciami -1?
@@ -148,7 +262,7 @@ void deleteMatrix(int** matrix)
 
 void Floyd_Warshall()
 {
-	int result = 0;
+	long long int result = 0;
 
 	for (int u = 0; u < allVertex; u++)
 	{
@@ -169,7 +283,7 @@ void Floyd_Warshall()
 	{
 		for (int j = 0; j < allVertex; j++)
 		{
-			if (distanceMatrix[i][j] != INT_MAX)
+			if (distanceMatrix[i][j] != MAXVAL)
 			{
 				result += distanceMatrix[i][j];
 			}
@@ -178,7 +292,13 @@ void Floyd_Warshall()
 
 	result /= 2; // nasz graf nie jest kierunkowy, wiêc algorytm ka¿d¹ krawêdŸ liczy jak dwie w dwóch kierunkach, dlatego wynik trzeb apodzieliæ na 2
 
-	printf("Result = %i\n", result);
+#ifdef DEBUG
+	printf("Result = %lli\n", result);
+#else
+	printf("%lli\n", result);
+#endif // DEBUG
+
+	
 }
 
 
@@ -203,15 +323,15 @@ void matrixForTest()
 	indexMatrix[1][3] = 1;
 	distanceMatrix[1][4] = 1;
 	indexMatrix[1][4] = 1;
-	distanceMatrix[1][5] = INT_MAX;
+	distanceMatrix[1][5] = MAXVAL;
 	//indexMatrix[1][5] = 1;
 	distanceMatrix[2][0] = 1;
 	indexMatrix[2][0] = 2;
 	distanceMatrix[2][1] = 1;
 	indexMatrix[2][1] = 2;
-	distanceMatrix[2][3] = INT_MAX;
+	distanceMatrix[2][3] = MAXVAL;
 	//indexMatrix[2][3] = 2;
-	distanceMatrix[2][4] = INT_MAX;
+	distanceMatrix[2][4] = MAXVAL;
 	//indexMatrix[2][4] = 2;
 	distanceMatrix[2][5] = 1;
 	indexMatrix[2][5] = 2;
@@ -219,27 +339,27 @@ void matrixForTest()
 	indexMatrix[3][0] = 3;
 	distanceMatrix[3][1] = 1;
 	indexMatrix[3][1] = 3;
-	distanceMatrix[3][2] = INT_MAX;
+	distanceMatrix[3][2] = MAXVAL;
 	distanceMatrix[3][4] = 1;
 	indexMatrix[3][4] = 3;
-	distanceMatrix[3][5] = INT_MAX;
+	distanceMatrix[3][5] = MAXVAL;
 	//indexMatrix[3][5] = 3;
 	distanceMatrix[4][0] = 1;
 	indexMatrix[4][0] = 4;
 	distanceMatrix[4][1] = 1;
 	indexMatrix[4][1] = 4;
-	distanceMatrix[4][2] = INT_MAX;
+	distanceMatrix[4][2] = MAXVAL;
 	distanceMatrix[4][3] = 1;
 	indexMatrix[4][3] = 4;
-	distanceMatrix[4][5] = INT_MAX;
+	distanceMatrix[4][5] = MAXVAL;
 	//indexMatrix[4][5] = 4;
 	distanceMatrix[5][0] = 1;
 	indexMatrix[5][0] = 5;
-	distanceMatrix[5][1] = INT_MAX;
+	distanceMatrix[5][1] = MAXVAL;
 	distanceMatrix[5][2] = 1;
 	indexMatrix[5][2] = 5;
-	distanceMatrix[5][3] = INT_MAX;
-	distanceMatrix[5][4] = INT_MAX;
+	distanceMatrix[5][3] = MAXVAL;
+	distanceMatrix[5][4] = MAXVAL;
 
 	Floyd_Warshall();
 

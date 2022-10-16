@@ -30,7 +30,10 @@
 
 int main()
 {
+#ifdef DEBUG
 	printf("Hello!\n");
+#endif // DEBUG
+
 
 	int noOfModel = 0;
 	int retval;
@@ -46,9 +49,11 @@ int main()
 		getModel(noOfModel);
 	}
 
+#ifdef DEBUG
 	printf("Bye!\n");
+#endif // DEBUG
 
-	
+
 	return 0;
 }
 

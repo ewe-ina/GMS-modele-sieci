@@ -4,6 +4,8 @@
 int allVertex;
 int** distanceMatrix;  // ktora na poczatku jest zwykla macieza sasiedztwa
 int** indexMatrix;  // identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty
+#define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
+#define DEBUG
 
 
 void getModel(int model);
