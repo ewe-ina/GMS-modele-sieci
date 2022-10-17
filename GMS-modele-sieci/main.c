@@ -3,7 +3,8 @@
 #include <string.h>
 #include "functions.h"
 
-/*
+/* Ewelina Walkusz 101645
+ * 
  * WEJŒCIE
  * W kolejnych liniach.
  * Indeks modelu. Po spacji/spacjach parametr/parametry modelu.

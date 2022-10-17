@@ -153,7 +153,8 @@ void Barabasi_Ravasz_Vicsek()
 		}
 
 		// przejœæ po ca³ej distanceMartix, jeœli nie ma krawêdzi oraz i != j to nieskoñczonoœæ
-		for (int i = 0; i < allVertex; i++)
+		addInfinity();
+		/*for (int i = 0; i < allVertex; i++)
 		{
 			for (int j = 0; j < allVertex; j++)
 			{
@@ -162,7 +163,7 @@ void Barabasi_Ravasz_Vicsek()
 					distanceMatrix[i][j] = MAXVAL;
 				}
 			}
-		}
+		}*/
 	}
 	
 
@@ -173,6 +174,7 @@ void Barabasi_Ravasz_Vicsek()
 	Floyd_Warshall();
 
 	deleteMatrix(distanceMatrix);
+	deleteMatrix(indexMatrix);
 		
 }
 
@@ -182,6 +184,111 @@ void Lu_Su_Guo()
 	printf("Lu-Su-Guo\n");
 #endif // DEBUG
 
+	scanf_s("%i", &allVertex);
+#ifdef DEBUG
+	printf("liczba wierzcholkow = %i\n", allVertex);
+#endif // DEBUG
+
+	distanceMatrix = createMatrix();
+	indexMatrix = createMatrix();
+
+	// krok 0
+	if (allVertex < 2)
+	{
+		printf("%i\n", 0);
+	}
+	else if (allVertex == 2)
+	{
+		printf("%i\n", 1);
+	}
+	else
+	{
+		// krok 1
+		int i, j;
+		for (i = 0; i < 3; i++)
+		{
+			for (j = 0; j < 3; j++)
+			{
+				if (i != j)
+				{
+					distanceMatrix[i][j] = 1;
+					indexMatrix[i][j] = i;
+					distanceMatrix[j][i] = 1;
+					indexMatrix[j][i] = j;
+				}
+			}
+		}
+
+		int trackIndex = 1;
+		int prevAddedVertex = i - trackIndex;
+#ifdef DEBUG
+		printf("trackIndex = %i\nliczba ostatnio dodanych wierzchow = %i\n", trackIndex, prevAddedVertex);
+#endif // DEBUG
+
+		// krok n (<1)
+		int k = 2;
+		int ancesorIndex = 0;
+		int tempIndex = 0;
+
+		if (allVertex > 3)
+		{
+			// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
+			do
+			{
+				tempIndex = trackIndex;
+				for (j = trackIndex; j <= prevAddedVertex; j++)
+				{
+					distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+					indexMatrix[i][j] = i;
+					indexMatrix[j][i] = j;
+					//polaczenie z przodkiem
+					ancesorIndex = ((i - 1) / 2) % (k - 1);
+					distanceMatrix[i][ancesorIndex] = distanceMatrix[ancesorIndex][i] = 1;
+					indexMatrix[i][ancesorIndex] = i;
+					indexMatrix[ancesorIndex][i] = ancesorIndex;
+
+					i++; 
+					if (i >= allVertex)
+						break;
+
+					distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+					indexMatrix[i][j] = i;
+					indexMatrix[j][i] = j;
+					//polaczenie z przodkiem
+					ancesorIndex = ((i - 1) / 2) % (k - 1);
+					distanceMatrix[i][ancesorIndex] = distanceMatrix[ancesorIndex][i] = 1;
+					indexMatrix[i][ancesorIndex] = i;
+					indexMatrix[ancesorIndex][i] = ancesorIndex;
+
+					// po³¹czenie miêdzy dodan¹ par¹
+					distanceMatrix[i][i - 1] = distanceMatrix[i - 1][i] = 1;
+					indexMatrix[i][i - 1] = i;
+					indexMatrix[i - 1][i] = i - 1;
+
+					trackIndex++;
+
+					i++;
+					if (i >= allVertex)
+						break;
+				}
+
+				prevAddedVertex = i - tempIndex;
+				k++;
+
+			} while (i < allVertex);
+
+		}
+
+		printMatrix(distanceMatrix);
+		printf("\n");
+		printMatrix(indexMatrix);
+
+		addInfinity();
+		Floyd_Warshall();
+	}
+
+	deleteMatrix(distanceMatrix);
+	deleteMatrix(indexMatrix);
 	
 	// test 1 6 -> JEST OK
 	// matrixForTest();
@@ -258,6 +365,20 @@ void deleteMatrix(int** matrix)
 		for (int i = 0; i < allVertex; ++i)
 			free(matrix[i]);
 		free(matrix);
+	}
+}
+
+void addInfinity()
+{
+	for (int i = 0; i < allVertex; i++)
+	{
+		for (int j = 0; j < allVertex; j++)
+		{
+			if (i != j && distanceMatrix[i][j] == 0)
+			{
+				distanceMatrix[i][j] = MAXVAL;
+			}
+		}
 	}
 }
 

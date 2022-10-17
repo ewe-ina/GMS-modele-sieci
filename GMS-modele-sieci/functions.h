@@ -20,6 +20,7 @@ void Kronecker();
 
 int** createMatrix();
 void deleteMatrix(int** matrix);
+void addInfinity();
 void Floyd_Warshall();
 
 // POMOCNICZE
