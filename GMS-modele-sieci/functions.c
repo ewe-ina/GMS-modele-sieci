@@ -44,6 +44,7 @@ void Barabasi_Ravasz_Vicsek()
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
+	if (k > 6) return;  // BEZPIECZNIK
 
 	allVertex = 1; // wêze³ w kroku 0
 
