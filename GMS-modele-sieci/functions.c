@@ -191,9 +191,9 @@ void Lu_Su_Guo_v2()
 
 	//wskaŸniki pomocnicze
 	vertex* v1;
-	vertex* node_2;
-	vertex* node3;
-	vertex* nodeTemp;
+	vertex* v2;
+	vertex* v3;
+	vertex* vTemp;
 	vertex* listHead;
 
 	//adjacencyListVertex** adjacencyList;	//tablica wskaŸników
@@ -202,14 +202,103 @@ void Lu_Su_Guo_v2()
 	createMatrix();	// pusta macierz s¹siedztwa
 
 	// krok 0
-	//tworzenie nowego wierzcho³ka - korzeñ
+	// nowy wierzcho³ek - korzeñ
 	v1 = malloc(sizeof(vertex)); // wskaŸnik
 	v1->index = 0;
 	v1->new = false; // bo to korzeñ
 
 	listHead = v1; // g³owa listy
 
+	// krok 1
 
+	v2 = malloc(sizeof(vertex));
+	v2->index = 2;	
+	v2->new = true;
+	v2->next = listHead;	// head to v1 next w v2 wskazuje na v1
+	listHead = v2;			// head teraz to v2
+
+	v3 = malloc(sizeof(vertex));
+	v3->index = 1;
+	v3->new = true;
+	v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
+	listHead = v3;
+
+	// aktualna lista nowych wêz³ów
+	// head->1->2
+
+	// wype³nienie macierzy s¹siedztwa
+	int i, j;
+	for (i = 0; i < 3; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			if (i != j)
+			{
+				adjacencyMatrix[i][j] = 1;
+				adjacencyMatrix[j][i] = 1;
+			}
+		}
+	}
+
+	int vertexCounter = 3;	// nie wiem czy bedzie potrzebny
+	int trackIndex = 1;
+	int prevAddedVertex = i - trackIndex;
+
+	// krok n (<1)
+	int k = 2;
+	int ancesorIndex = 0;
+	int tempIndex = 0;
+
+	if (allVertex > 3)
+	{
+		// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
+		do
+		{
+			tempIndex = trackIndex;
+			for (j = trackIndex; j <= prevAddedVertex; j++)
+			{
+				adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
+				//polaczenie z przodkiem
+				ancesorIndex = ((i - 1) / 2) % (k - 1);
+				adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+
+				i++;
+				if (i >= allVertex)
+					break;
+
+				adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
+				//polaczenie z przodkiem
+				ancesorIndex = ((i - 1) / 2) % (k - 1);
+				adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+
+				// po³¹czenie miêdzy dodan¹ par¹
+				adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
+
+				trackIndex++;
+
+				i++;
+				if (i >= allVertex)
+					break;
+			}
+
+			prevAddedVertex = i - tempIndex;
+			k++;
+
+		} while (i < allVertex);
+
+	}
+
+	// macierz jest gotowa, czyli nie potrzebujê tych list powy¿ej (chyba, ¿e bêdzie coœ nie tak, to trzeba siê przyjrzeæ
+	// przepisanie macierzy do list s¹siedztwa
+	createAdjacencyLists();
+	matrixToList();
+
+	// TODO algorytm BFS dla list s¹siedztwa (dla macierzy na za du¿¹ z³ozonoœæ czasow¹)
+	// TODO zapisywanie wyników do tablicy
+
+
+	deleteMatrix(adjacencyMatrix);
+	deleteAdjacencyLists(adjacencyLists);
 }
 
 void Lu_Su_Guo()
@@ -371,7 +460,7 @@ void Kronecker()
 
 }
 
-int** createMatrix() // moze zainicjowac wartosciami -1?
+int** createMatrix()
 {
 	int** matrix = (int**)calloc(allVertex, sizeof(int*));
 	if (matrix != NULL)
@@ -404,6 +493,29 @@ void deleteMatrix(int** matrix)
 		free(matrix);
 	}
 }
+
+adjacencyListVertex** createAdjacencyLists()
+{
+	adjacencyListVertex** matrix = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
+	if (matrix != NULL)
+	{
+		for (int i = 0; i < allVertex; ++i)
+			matrix[i] = (adjacencyListVertex*)calloc(allVertex, sizeof(adjacencyListVertex));
+	}
+
+	return matrix;
+}
+
+void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists)
+{
+	if (adjacencyLists != NULL)
+	{
+		for (int i = 0; i < allVertex; ++i)
+			free(adjacencyLists[i]);
+		free(adjacencyLists);
+	}
+}
+
 
 void addInfinity(int** distanceMatrix)
 {
@@ -471,11 +583,11 @@ void matrixToList()
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
-				adjacencyListVertex* aListVertex = malloc(sizeof(adjacencyListVertex));				
-				aListVertex->index = j;
-				aListVertex->bottom = false;
-				aListVertex->next = adjacencyList[i];
-				adjacencyList[i] = aListVertex;
+				adjacencyListVertex* v = malloc(sizeof(adjacencyListVertex));				
+				v->index = j;
+				//v->bottom = false;
+				v->next = adjacencyLists[i];
+				adjacencyLists[i] = v;
 			}
 		}
 	}

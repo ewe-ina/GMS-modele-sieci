@@ -6,7 +6,7 @@
 int allVertex;
 int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
 int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
-adjacencyListVertex** adjacencyList;	//tablica wskaŸników
+adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 #define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
 //#define DEBUG
@@ -41,6 +41,10 @@ void Kronecker();
 
 int** createMatrix();
 void deleteMatrix(int** matrix);
+adjacencyListVertex** createAdjacencyLists(); // to te¿ tablica 2 wymiarowa
+void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists);
+
+
 void addInfinity(int** distanceMatrix);
 void Floyd_Warshall(int** distanceMatrix);
 
