@@ -75,7 +75,7 @@ void Barabasi_Ravasz_Vicsek()
 #endif // DEBUG
 
 
-	distanceMatrix = createMatrix();
+	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
 
 	// TODO: zbudowaæ graf --> macierz s¹siedztwa i macieæ identyfikatorów
@@ -97,7 +97,7 @@ void Barabasi_Ravasz_Vicsek()
 	{
 		for (i = 1; i < 3; i++)
 		{
-			distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
 			indexMatrix[i][j] = i;
 			indexMatrix[j][i] = j;
 		}
@@ -113,28 +113,28 @@ void Barabasi_Ravasz_Vicsek()
 			{
 				for (int j = 0; j < copyVertex; j++)
 				{
-					if (distanceMatrix[i][j] == 1)
+					if (adjacencyMatrix[i][j] == 1)
 					{
 						copyIndex_i = i + copyVertex;
 						copyIndex_j = j + copyVertex;
-						distanceMatrix[copyIndex_i][copyIndex_j] = 1;
+						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
 						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
-						if (j > prevCopyIndex && distanceMatrix[0][j] == 1)
+						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							distanceMatrix[0][copyIndex_j] = distanceMatrix[copyIndex_j][0] = 1;
+							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
 							indexMatrix[0][copyIndex_j] = 0;
 							indexMatrix[copyIndex_j][0] = copyIndex_j;
 						}
 
 						copyIndex_i += copyVertex;
 						copyIndex_j += copyVertex;
-						distanceMatrix[copyIndex_i][copyIndex_j] = 1;
+						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
 						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
-						if (j > prevCopyIndex && distanceMatrix[0][j] == 1)
+						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							distanceMatrix[0][copyIndex_j] = distanceMatrix[copyIndex_j][0] = 1;
+							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
 							indexMatrix[0][copyIndex_j] = 0;
 							indexMatrix[copyIndex_j][0] = copyIndex_j;
 						}
@@ -153,7 +153,7 @@ void Barabasi_Ravasz_Vicsek()
 		}
 
 		// przejœæ po ca³ej distanceMartix, jeœli nie ma krawêdzi oraz i != j to nieskoñczonoœæ
-		addInfinity();
+		addInfinity(adjacencyMatrix);
 		/*for (int i = 0; i < allVertex; i++)
 		{
 			for (int j = 0; j < allVertex; j++)
@@ -169,13 +169,38 @@ void Barabasi_Ravasz_Vicsek()
 
 
 
-	//printMatrix(distanceMatrix);
+	//printMatrix(adjacencyMatrix);
 	
-	Floyd_Warshall();
+	Floyd_Warshall(adjacencyMatrix);
 
-	deleteMatrix(distanceMatrix);
+	deleteMatrix(adjacencyMatrix);
 	deleteMatrix(indexMatrix);
 		
+}
+
+void Lu_Su_Guo_v2()
+{
+#ifdef DEBUG
+	printf("Lu-Su-Guo v2\n");
+#endif // DEBUG
+
+	scanf_s("%i", &allVertex);
+#ifdef DEBUG
+	printf("liczba wierzcholkow = %i\n", allVertex);
+#endif // DEBUG
+
+	//wskaŸniki pomocnicze
+	vertex* node_1;
+	vertex* node_2;
+	vertex* node3;
+	vertex* nodeTemp;
+	vertex* listHead;
+
+	//adjacencyListVertex** adjacencyList;	//tablica wskaŸników
+	adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
+
+	createMatrix();	// pusta macierz s¹siedztwa
+
 }
 
 void Lu_Su_Guo()
@@ -189,7 +214,7 @@ void Lu_Su_Guo()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	distanceMatrix = createMatrix();
+	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
 
 	// krok 0
@@ -211,9 +236,9 @@ void Lu_Su_Guo()
 			{
 				if (i != j)
 				{
-					distanceMatrix[i][j] = 1;
+					adjacencyMatrix[i][j] = 1;
 					indexMatrix[i][j] = i;
-					distanceMatrix[j][i] = 1;
+					adjacencyMatrix[j][i] = 1;
 					indexMatrix[j][i] = j;
 				}
 			}
@@ -238,12 +263,12 @@ void Lu_Su_Guo()
 				tempIndex = trackIndex;
 				for (j = trackIndex; j <= prevAddedVertex; j++)
 				{
-					distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+					adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
 					indexMatrix[i][j] = i;
 					indexMatrix[j][i] = j;
 					//polaczenie z przodkiem
 					ancesorIndex = ((i - 1) / 2) % (k - 1);
-					distanceMatrix[i][ancesorIndex] = distanceMatrix[ancesorIndex][i] = 1;
+					adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
 					indexMatrix[i][ancesorIndex] = i;
 					indexMatrix[ancesorIndex][i] = ancesorIndex;
 
@@ -251,17 +276,17 @@ void Lu_Su_Guo()
 					if (i >= allVertex)
 						break;
 
-					distanceMatrix[i][j] = distanceMatrix[j][i] = 1;
+					adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
 					indexMatrix[i][j] = i;
 					indexMatrix[j][i] = j;
 					//polaczenie z przodkiem
 					ancesorIndex = ((i - 1) / 2) % (k - 1);
-					distanceMatrix[i][ancesorIndex] = distanceMatrix[ancesorIndex][i] = 1;
+					adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
 					indexMatrix[i][ancesorIndex] = i;
 					indexMatrix[ancesorIndex][i] = ancesorIndex;
 
 					// po³¹czenie miêdzy dodan¹ par¹
-					distanceMatrix[i][i - 1] = distanceMatrix[i - 1][i] = 1;
+					adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
 					indexMatrix[i][i - 1] = i;
 					indexMatrix[i - 1][i] = i - 1;
 
@@ -280,18 +305,18 @@ void Lu_Su_Guo()
 		}
 
 #ifdef DEBUG
-		printMatrix(distanceMatrix);
+		printMatrix(adjacencyMatrix);
 		printf("\n");
 		printMatrix(indexMatrix);
 		printf("\n");
 #endif // DEBUG
 
 		
-		addInfinity();
-		Floyd_Warshall();
+		addInfinity(adjacencyMatrix);
+		Floyd_Warshall(adjacencyMatrix);
 	}
 
-	deleteMatrix(distanceMatrix);
+	deleteMatrix(adjacencyMatrix);
 	deleteMatrix(indexMatrix);
 	
 	// test 1 6 -> JEST OK
@@ -372,7 +397,7 @@ void deleteMatrix(int** matrix)
 	}
 }
 
-void addInfinity()
+void addInfinity(int** distanceMatrix)
 {
 	for (int i = 0; i < allVertex; i++)
 	{
@@ -386,7 +411,7 @@ void addInfinity()
 	}
 }
 
-void Floyd_Warshall()
+void Floyd_Warshall(int** distanceMatrix)
 {
 	long long int result = 0;
 
@@ -429,69 +454,118 @@ void Floyd_Warshall()
 	
 }
 
+// zamiana macierzy s¹siedztwa na listê
+void matrixToList() 
+{
+	for (int i = allVertex - 1; i >= 0; i--) 
+	{
+		for (int j = allVertex - 1; j >= 0; j--) 
+		{
+			if (adjacencyMatrix[i][j] == 1) 
+			{
+				adjacencyListVertex aListVertex = { 
+					.index = 0,
+					.bottom = false,
+					.next = NULL
+				};
+				adjacencyListVertex* aListVertexPtr = &aListVertex;
+				aListVertexPtr->index = j;
+				aListVertexPtr->next = adjacencyList[i];
+				adjacencyList[i] = aListVertexPtr;
+			}
+		}
+	}
+}
+
+//BFS_node_data* BFS(AdjecentListElement** A, int n, int start) {
+//	AdjecentListElement* node;
+//	BFS_node_data* tab = new BFS_node_data[n];
+//	for (int i = 0; i < n; i++) {
+//		tab[i].distance = INT32_MAX;
+//	}
+//	tab[start].distance = 0;
+//	tab[start].visited = true;
+//	queue<int> q;
+//	q.push(start);
+//	while (q.size() != 0) {
+//		int u = q.front();
+//		q.pop();
+//		node = A[u];
+//		while (node) {
+//			if ((node->id != u) && (tab[node->id].visited == false)) {
+//				tab[node->id].distance = tab[u].distance + 1;
+//				tab[node->id].visited = true;
+//				q.push(node->id);
+//			}
+//			node = node->next;
+//		}
+//	}
+//	return tab;
+//}
+
 
 // POMOCNICZE
 void matrixForTest()
 {
 	// dla wejœcia: 1 6 | wyjscie: 20
 	allVertex = 6;
-	distanceMatrix = createMatrix();
+	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
 
-	distanceMatrix[0][1] = 1;
-	distanceMatrix[0][2] = 1;
-	distanceMatrix[0][3] = 1;
-	distanceMatrix[0][4] = 1;
-	distanceMatrix[0][5] = 1;
-	distanceMatrix[1][0] = 1;
+	adjacencyMatrix[0][1] = 1;
+	adjacencyMatrix[0][2] = 1;
+	adjacencyMatrix[0][3] = 1;
+	adjacencyMatrix[0][4] = 1;
+	adjacencyMatrix[0][5] = 1;
+	adjacencyMatrix[1][0] = 1;
 	indexMatrix[1][0] = 1;
-	distanceMatrix[1][2] = 1;
+	adjacencyMatrix[1][2] = 1;
 	indexMatrix[1][2] = 1;
-	distanceMatrix[1][3] = 1;
+	adjacencyMatrix[1][3] = 1;
 	indexMatrix[1][3] = 1;
-	distanceMatrix[1][4] = 1;
+	adjacencyMatrix[1][4] = 1;
 	indexMatrix[1][4] = 1;
-	distanceMatrix[1][5] = MAXVAL;
+	adjacencyMatrix[1][5] = MAXVAL;
 	//indexMatrix[1][5] = 1;
-	distanceMatrix[2][0] = 1;
+	adjacencyMatrix[2][0] = 1;
 	indexMatrix[2][0] = 2;
-	distanceMatrix[2][1] = 1;
+	adjacencyMatrix[2][1] = 1;
 	indexMatrix[2][1] = 2;
-	distanceMatrix[2][3] = MAXVAL;
+	adjacencyMatrix[2][3] = MAXVAL;
 	//indexMatrix[2][3] = 2;
-	distanceMatrix[2][4] = MAXVAL;
+	adjacencyMatrix[2][4] = MAXVAL;
 	//indexMatrix[2][4] = 2;
-	distanceMatrix[2][5] = 1;
+	adjacencyMatrix[2][5] = 1;
 	indexMatrix[2][5] = 2;
-	distanceMatrix[3][0] = 1;
+	adjacencyMatrix[3][0] = 1;
 	indexMatrix[3][0] = 3;
-	distanceMatrix[3][1] = 1;
+	adjacencyMatrix[3][1] = 1;
 	indexMatrix[3][1] = 3;
-	distanceMatrix[3][2] = MAXVAL;
-	distanceMatrix[3][4] = 1;
+	adjacencyMatrix[3][2] = MAXVAL;
+	adjacencyMatrix[3][4] = 1;
 	indexMatrix[3][4] = 3;
-	distanceMatrix[3][5] = MAXVAL;
+	adjacencyMatrix[3][5] = MAXVAL;
 	//indexMatrix[3][5] = 3;
-	distanceMatrix[4][0] = 1;
+	adjacencyMatrix[4][0] = 1;
 	indexMatrix[4][0] = 4;
-	distanceMatrix[4][1] = 1;
+	adjacencyMatrix[4][1] = 1;
 	indexMatrix[4][1] = 4;
-	distanceMatrix[4][2] = MAXVAL;
-	distanceMatrix[4][3] = 1;
+	adjacencyMatrix[4][2] = MAXVAL;
+	adjacencyMatrix[4][3] = 1;
 	indexMatrix[4][3] = 4;
-	distanceMatrix[4][5] = MAXVAL;
+	adjacencyMatrix[4][5] = MAXVAL;
 	//indexMatrix[4][5] = 4;
-	distanceMatrix[5][0] = 1;
+	adjacencyMatrix[5][0] = 1;
 	indexMatrix[5][0] = 5;
-	distanceMatrix[5][1] = MAXVAL;
-	distanceMatrix[5][2] = 1;
+	adjacencyMatrix[5][1] = MAXVAL;
+	adjacencyMatrix[5][2] = 1;
 	indexMatrix[5][2] = 5;
-	distanceMatrix[5][3] = MAXVAL;
-	distanceMatrix[5][4] = MAXVAL;
+	adjacencyMatrix[5][3] = MAXVAL;
+	adjacencyMatrix[5][4] = MAXVAL;
 
-	Floyd_Warshall();
+	Floyd_Warshall(adjacencyMatrix);
 
-	deleteMatrix(distanceMatrix);
+	deleteMatrix(adjacencyMatrix);
 	deleteMatrix(indexMatrix);
 }
 
