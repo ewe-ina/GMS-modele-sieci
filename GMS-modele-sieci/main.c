@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "functions.h"
+#include "stack.h"
 
 /* Ewelina Walkusz 101645
  * 
