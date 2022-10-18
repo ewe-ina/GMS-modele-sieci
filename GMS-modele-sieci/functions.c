@@ -190,7 +190,7 @@ void Lu_Su_Guo_v2()
 #endif // DEBUG
 
 	//wskaŸniki pomocnicze
-	vertex* node_1;
+	vertex* v1;
 	vertex* node_2;
 	vertex* node3;
 	vertex* nodeTemp;
@@ -200,6 +200,15 @@ void Lu_Su_Guo_v2()
 	adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
 
 	createMatrix();	// pusta macierz s¹siedztwa
+
+	// krok 0
+	//tworzenie nowego wierzcho³ka - korzeñ
+	v1 = malloc(sizeof(vertex)); // wskaŸnik
+	v1->index = 0;
+	v1->new = false; // bo to korzeñ
+
+	listHead = v1; // g³owa listy
+
 
 }
 
@@ -371,14 +380,13 @@ int** createMatrix() // moze zainicjowac wartosciami -1?
 			matrix[i] = (int*)calloc(allVertex, sizeof(int));
 	}
 
-	for (int i = 0; i < allVertex; i++)
+	for (int i = 0; i < allVertex; i++) // TO RACZEJ NIEPOTRZEBNE
 	{
 		for (int j = 0; j < allVertex; j++)
 		{
 			
 			if (matrix != NULL && *matrix != NULL)
 			{
-			//printf("[i,j] = [%i,%i]\n", i, j);
 			matrix[i][j] = 0;
 			}
 		}
@@ -463,15 +471,11 @@ void matrixToList()
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
-				adjacencyListVertex aListVertex = { 
-					.index = 0,
-					.bottom = false,
-					.next = NULL
-				};
-				adjacencyListVertex* aListVertexPtr = &aListVertex;
-				aListVertexPtr->index = j;
-				aListVertexPtr->next = adjacencyList[i];
-				adjacencyList[i] = aListVertexPtr;
+				adjacencyListVertex* aListVertex = malloc(sizeof(adjacencyListVertex));				
+				aListVertex->index = j;
+				aListVertex->bottom = false;
+				aListVertex->next = adjacencyList[i];
+				adjacencyList[i] = aListVertex;
 			}
 		}
 	}
