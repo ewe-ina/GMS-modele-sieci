@@ -279,10 +279,14 @@ void Lu_Su_Guo()
 
 		}
 
+#ifdef DEBUG
 		printMatrix(distanceMatrix);
 		printf("\n");
 		printMatrix(indexMatrix);
+		printf("\n");
+#endif // DEBUG
 
+		
 		addInfinity();
 		Floyd_Warshall();
 	}
@@ -392,18 +396,19 @@ void Floyd_Warshall()
 		{
 			for (int j = 0; j < allVertex; j++)
 			{
-				if (distanceMatrix[i][j] > distanceMatrix[i][u] + distanceMatrix[u][j])
+				if (distanceMatrix[i][u] != MAXVAL && distanceMatrix[u][j] != MAXVAL && distanceMatrix[i][j] > distanceMatrix[i][u] + distanceMatrix[u][j])
 				{
-					distanceMatrix[i][j] = distanceMatrix[i][u] + distanceMatrix[u][i];
+					distanceMatrix[i][j] = distanceMatrix[i][u] + distanceMatrix[u][j];
 					indexMatrix[i][j] = indexMatrix[u][j];
 				}
 			}
 		}
 	}
 
+
 	for (int i = 0; i < allVertex; i++)
 	{
-		for (int j = 0; j < allVertex; j++)
+		for (int j = i; j < allVertex; j++)
 		{
 			if (distanceMatrix[i][j] != MAXVAL)
 			{
@@ -412,10 +417,11 @@ void Floyd_Warshall()
 		}
 	}
 
-	result /= 2; // nasz graf nie jest kierunkowy, wiêc algorytm ka¿d¹ krawêdŸ liczy jak dwie w dwóch kierunkach, dlatego wynik trzeb apodzieliæ na 2
+	//result /= 2; // nasz graf nie jest kierunkowy, wiêc algorytm ka¿d¹ krawêdŸ liczy jak dwie w dwóch kierunkach, dlatego wynik trzeb apodzieliæ na 2
 
 #ifdef DEBUG
 	printf("Result = %lli\n", result);
+	printMatrix(distanceMatrix);
 #else
 	printf("%lli\n", result);
 #endif // DEBUG
