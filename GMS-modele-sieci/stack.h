@@ -4,7 +4,7 @@
 #include "functions.h"
 
 
-vertex* push(vertex* v);
+vertex* push(vertex *v);
 vertex* pop();
 bool empty();
 bool full();

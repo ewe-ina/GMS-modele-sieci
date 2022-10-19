@@ -1,10 +1,9 @@
 #include "stack.h"
 
-#define QSIZE 200
 
-int Q[QSIZE];
-int head;
-int tail;
+
+//memset(Q, 0, QSIZE * sizeof(*visited));
+
 
 void enqueue(int v)
 {
@@ -23,6 +22,11 @@ int dequeue()
     else
         head++;
     return v;
+}
+
+int frontQ()
+{
+    return head;
 }
 
 bool emptyQ()

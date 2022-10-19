@@ -17,7 +17,8 @@ vertex* pop()
     }
 }
 
-vertex* push(vertex* v) {
+vertex* push(vertex* v) 
+{
 
     if (!full()) 
     {

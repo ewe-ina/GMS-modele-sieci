@@ -4,7 +4,7 @@
 #include <string.h>
 #include "functions.h"
 #include "queue.h"
-#include "stack.h"
+//#include "stack.h"
 
 /* Ewelina Walkusz 101645
  * 

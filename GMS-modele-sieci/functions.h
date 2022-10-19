@@ -2,30 +2,45 @@
 #define FUNCTIONS_H
 
 #include <stdbool.h>
+#include "queue.h"
+//#include "stack.h"
+
+#define QSIZE 200
+
+int Q[QSIZE];
+int head;
+int tail;
 
 int allVertex;
 int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
 int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
-adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+struct _adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 #define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
-//#define DEBUG
+#define DEBUG
 
 
-typedef struct vertex 
+typedef struct _vertex 
 {
 	int index;							// indeks wierzcho³ka
 	bool new;							// czy wierzcho³ek jest nowy?
-	vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
+	struct _vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
 }vertex;
 
 // do Lu-Su-Guo_v2
-typedef struct adjacencyListVertex		// wierzcholek przechowywany w liscie sasiedztwa
+typedef struct _adjacencyListVertex		// wierzcholek przechowywany w liscie sasiedztwa
 {
 	int index;							// indeks wierzcho³ka
 	bool bottom;						// czy jest dolnym wierzcho³kiem?
-	struct adjacencyListVertex* next;	// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa 
+	struct _adjacencyListVertex *next;	// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa 
 }adjacencyListVertex;
+
+// do BFS
+typedef struct _BFSvertex 
+{
+	int distance;						// odleg³oœæ
+	bool visited;						// czy wierzcho³ek zosta³ ju¿ odwiedzony?
+}BFSvertex;
 
 
 void getModel(int model);
@@ -50,8 +65,11 @@ void Floyd_Warshall(int** distanceMatrix);
 
 void matrixToList();
 
+BFSvertex* BFS(int start);
+
 // POMOCNICZE
 void matrixForTest();
 void printMatrix(int** matrix);
+void printAdjacencyList();
 
 #endif // !FUNCTIONS_H
