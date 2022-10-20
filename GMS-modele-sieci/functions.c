@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include "functions.h"
 
 void getModel(int model)
@@ -666,14 +666,13 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 #endif // DEBUG
 
 
-	tail = 0;
-	head = 0;
-	enqueue(start);	// u¿ywamy funkcji z queue.c
-	while (!emptyQ()) 
+	queue *q = createQueue();  // tworzymy kolejkê
+	enqueue(q, start);	
+	while (!emptyQ(q)) 
 	{
-		int u = frontQ();
+		int u = frontQ(q);
 
-		dequeue();
+		dequeue(q);
 		v = adjacencyLists[u];
 
 #ifdef DEBUG
@@ -691,7 +690,7 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 				printf("tab[%i].distance = %i\n", v->index, tab[v->index].distance);
 #endif // DEBUG
 
-				enqueue(v->index);
+				enqueue(q, v->index);
 			}
 			v = v->next;
 		}

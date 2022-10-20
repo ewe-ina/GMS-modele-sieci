@@ -1,15 +1,18 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 #include "queue.h"
-//#include "stack.h"
 
-#define QSIZE 200
 
-int Q[QSIZE];
-int head;
-int tail;
+//#define QSIZE 200
+
+//int Q[QSIZE];
+//int head;
+//int tail;
 
 int allVertex;
 int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
