@@ -641,10 +641,6 @@ void matrixToList()
 
 BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 {
-#ifdef DEBUG
-	printf("start = %i\n", start);
-#endif // DEBUG
-
 	adjacencyListVertex* v;
 	BFSvertex* tab = malloc(sizeof(BFSvertex) * allVertex);
 	for (int i = 0; i < allVertex; i++) 
@@ -656,15 +652,6 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 	tab[start].distance = 0;
 	tab[start].visited = true;
 
-#ifdef DEBUG
-	for (int i = 0; i < allVertex; i++) 
-	{
-		printf("tab[%i].distance = %9i\n",i, tab[i].distance);
-		printf("tab[%i].visited = %9s\n", i, tab[i].visited ? "true" : "false");
-	}
-	printf("\n");
-#endif // DEBUG
-
 
 	queue *q = createQueue();  // tworzymy kolejkê
 	enqueue(q, start);	
@@ -675,34 +662,18 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 		dequeue(q);
 		v = adjacencyLists[u];
 
-#ifdef DEBUG
-		printf("u = %i\n", u);
-		printf("v->index = %i\n", v->index);
-#endif // DEBUG
-
 		while (v) 
 		{
 			if ((v->index != u) && (tab[v->index].visited == false)) 
 			{
 				tab[v->index].distance = tab[u].distance + 1;
 				tab[v->index].visited = true;
-#ifdef DEBUG
-				printf("tab[%i].distance = %i\n", v->index, tab[v->index].distance);
-#endif // DEBUG
 
 				enqueue(q, v->index);
 			}
 			v = v->next;
 		}
 	}
-
-#ifdef DEBUG
-	for (int i = 0; i < allVertex; i++)
-	{
-		printf("tab[%i].distance = %9i  ", i, tab[i]);
-	}
-	printf("\n\n");
-#endif // DEBUG
 
 	return tab;
 }
