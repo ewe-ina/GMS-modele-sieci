@@ -6,6 +6,8 @@ stack* createStack()
     s->top = NULL;
     s->bottom = NULL;
     s->counter = 0;
+
+    return s;
 }
 
 void push(stack* s, vertex* v)

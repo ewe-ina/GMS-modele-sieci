@@ -327,45 +327,6 @@ void Lu_Su_Guo_v2()
 		}
 
 
-		//if (allVertex > 3)
-		//{
-		//	// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
-		//	do
-		//	{
-		//		tempIndex = trackIndex;
-		//		for (j = trackIndex; j <= prevAddedVertex; j++)
-		//		{
-		//			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-		//			//polaczenie z przodkiem
-		//			ancesorIndex = ((i - 1) / 2) % (k - 1);
-		//			adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
-
-					//i++;
-					//if (i >= allVertex)
-					//	break;
-
-					//adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-					////polaczenie z przodkiem
-					//ancesorIndex = ((i - 1) / 2) % (k - 1);
-					//adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
-
-					//// po³¹czenie miêdzy dodan¹ par¹
-					//adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
-
-					//trackIndex++;
-
-		//			i++;
-		//			if (i >= allVertex)
-		//				break;
-		//		}
-
-		//		prevAddedVertex = i - tempIndex;
-		//		k++;
-
-		//	} while (i < allVertex);
-
-		//}
-
 		// macierz jest gotowa, czyli nie potrzebujê tych list powy¿ej (chyba, ¿e bêdzie coœ nie tak, to trzeba siê przyjrzeæ
 		// przepisanie macierzy do list s¹siedztwa
 		adjacencyLists = createAdjacencyLists();
@@ -387,19 +348,7 @@ void Lu_Su_Guo_v2()
 		if (resultsMemo[allVertex] == -1)
 		{
 			int distanceSum = 0;
-			for (int v = 0; v < allVertex; v++)
-			{
-				// suma odleglosci miêdzy wierzcho³kiem v a pozosta³ymi (kolejnymi, unikamy tu powrórnego liczenia odleg³oœci w drug¹ str)
-				BFSvertex* sum = BFS(v);
-				for (int i = v; i < allVertex; i++)
-				{
-					//i sumuje te odleg³oœci
-					distanceSum += sum[i].distance;
-
-				}
-				free(sum);
-			}
-
+			distanceSum = countDistances();
 			resultsMemo[allVertex] = distanceSum;
 		}
 
@@ -701,6 +650,24 @@ void matrixToList()
 	printAdjacencyList();
 #endif // DEBUG
 
+}
+
+int countDistances()
+{
+	int distanceSum = 0;
+	for (int v = 0; v < allVertex; v++)
+	{
+		// suma odleglosci miêdzy wierzcho³kiem v a pozosta³ymi (kolejnymi, unikamy tu powrórnego liczenia odleg³oœci w drug¹ str)
+		BFSvertex* sum = BFS(v);
+		for (int i = v; i < allVertex; i++)
+		{
+			//i sumuje te odleg³oœci
+			distanceSum += sum[i].distance;
+
+		}
+		free(sum);
+	}
+	return distanceSum;
 }
 
 BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa

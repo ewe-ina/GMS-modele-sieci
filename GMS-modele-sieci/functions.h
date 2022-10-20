@@ -62,6 +62,7 @@ void Floyd_Warshall(int** distanceMatrix);
 
 void matrixToList();
 
+int countDistances();
 BFSvertex* BFS(int start);
 
 // POMOCNICZE

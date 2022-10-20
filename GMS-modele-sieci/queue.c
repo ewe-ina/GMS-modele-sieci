@@ -8,6 +8,8 @@ queue *createQueue()
     q->head = NULL;
     q->tail = NULL;
     q->counter = 0;
+
+    return q;
 }
 
 void enqueue(queue* q, int data)
