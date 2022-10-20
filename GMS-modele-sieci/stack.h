@@ -4,9 +4,24 @@
 #include "functions.h"
 
 
-vertex* push(vertex *v);
-vertex* pop();
-bool empty();
-bool full();
+typedef struct _snode
+{
+	vertex* v;
+	struct _snode* ptr;
+}snode;
+
+typedef struct _stack
+{
+	snode* top;
+	snode* bottom;
+	int counter;
+}stack;
+
+stack* createStack();
+void push(stack* s, vertex* v);
+vertex* pop(stack* s);
+vertex* top(stack* s);
+bool empty(stack* s);
+
 
 #endif // !STACK_H

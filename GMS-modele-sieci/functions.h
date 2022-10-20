@@ -6,13 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "queue.h"
-
-
-//#define QSIZE 200
-
-//int Q[QSIZE];
-//int head;
-//int tail;
+#include "stack.h"
 
 int allVertex;
 int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
@@ -20,7 +14,7 @@ int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz
 struct _adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 #define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
-#define DEBUG
+//#define DEBUG
 
 
 typedef struct _vertex 

@@ -7,7 +7,7 @@ queue *createQueue()
     queue* q = (queue*)malloc(sizeof(queue));
     q->head = NULL;
     q->tail = NULL;
-    q->couter = 0;
+    q->counter = 0;
 }
 
 void enqueue(queue* q, int data)
@@ -26,7 +26,7 @@ void enqueue(queue* q, int data)
         {
             q->tail->next = node;
         }
-        q->couter++;
+        q->counter++;
         q->tail = node; // przesuñ wskaŸnik na nowy ogon
     }
 }
@@ -47,7 +47,7 @@ int dequeue(queue* q)
     }
     free(temp);
     temp = NULL;
-    q->couter--;
+    q->counter--;
     return data;
 }
 
@@ -56,12 +56,11 @@ int frontQ(queue* q)
     if (q->head == NULL)
     {
         return -1;
-    }
-        
+    }   
     return q->head->data;
 }
 
 bool emptyQ(queue* q)
 {
-    return q->couter == 0;
+    return q->counter == 0;
 }

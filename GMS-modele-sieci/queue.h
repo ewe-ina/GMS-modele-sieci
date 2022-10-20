@@ -14,7 +14,7 @@ typedef struct _queue
 {
 	qnode *head;
 	qnode* tail;
-	int couter;
+	int counter;
 }queue;
 
 queue* createQueue();

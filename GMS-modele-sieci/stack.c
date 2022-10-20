@@ -1,38 +1,65 @@
 #include "stack.h"
 
-#define MAXSIZE 100
-
-vertex* stack[MAXSIZE];
-int top = -1;
-
-vertex* pop() 
+stack* createStack()
 {
-    vertex* v;
+    stack* s = (stack*)malloc(sizeof(stack));
+    s->top = NULL;
+    s->bottom = NULL;
+    s->counter = 0;
+}
 
-    if (!empty()) 
+void push(stack* s, vertex* v)
+{
+    snode* node = (snode*)malloc(sizeof(snode));
+    if (node != NULL)
     {
-        v = stack[top];
-        top--;
-        return v;
+        node->v = v;
+        node->ptr = NULL;
+
+        if (s->counter == 0) //dodaj pierwszy wierzcho³ek na stos
+        {
+            s->bottom = node;
+            
+        }
+        else // dodaj na wierzchu stosu nowy bêdzie wskazywa³ na top
+        {
+            node->ptr = s->top;
+        }
+        s->counter++;
+        s->top = node; // przesuwamy wska¿nik do góry
     }
 }
 
-vertex* push(vertex* v) 
+vertex* pop(stack* s)
 {
-
-    if (!full()) 
+    if (s->bottom == NULL)
     {
-        top++;
-        stack[top] = v;
+        return -1;
     }
+
+    snode* temp = s->top;
+    vertex* v = temp->v;
+    s->top = s->top->ptr; //przesuwamy wskaŸni top o jeden nizej
+    if (s->top == NULL) // to by³ ostatni na nic ni¿ej nie wskazal
+    {
+        s->bottom = NULL;
+    }
+    free(temp);
+    temp = NULL;
+    s->counter--;
+    return v;
 }
 
-bool full() 
+vertex* top(stack* s) 
 {
-    return (top == MAXSIZE);
+    if (s->top == NULL)
+    {
+        return -1;
+    }
+    return s->top->v;
 }
 
-bool empty() 
+bool empty(stack* s)
 {
-    return (top == -1);
+    return s->counter == 0;
 }
