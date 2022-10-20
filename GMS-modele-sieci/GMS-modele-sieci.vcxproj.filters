@@ -21,9 +21,21 @@
     <ClCompile Include="functions.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stack.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="queue.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stack.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="queue.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
