@@ -3,6 +3,8 @@
 
 #include "functions.h"
 
+typedef struct _vertex vertex;
+
 
 typedef struct _snode
 {

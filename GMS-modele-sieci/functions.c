@@ -190,44 +190,19 @@ void Lu_Su_Guo_v2()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	////wskaŸniki pomocnicze
-	//vertex* v1;
-	//vertex* v2;
-	//vertex* v3;
-	//vertex* vTemp;
-	//vertex* listHead;
+	//wskaŸniki pomocnicze
+	vertex* v1;
+	vertex* v2;
+	vertex* v3;
+	vertex* vTemp;
+	vertex* listHead;	// wskaŸnik na listê nowych wêz³ów
 
-	////adjacencyListVertex** adjacencyList;	//tablica wskaŸników
-	//adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
+	//adjacencyListVertex** adjacencyList;	//tablica wskaŸników
+	adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
 
-	//createMatrix();	// pusta macierz s¹siedztwa
+	adjacencyMatrix = createMatrix();	// pusta macierz s¹siedztwa
 
-	//// krok 0
-	//// nowy wierzcho³ek - korzeñ
-	//v1 = malloc(sizeof(vertex)); // wskaŸnik
-	//v1->index = 0;
-	//v1->new = false; // bo to korzeñ
-
-	//listHead = v1; // g³owa listy
-
-	//// krok 1
-
-	//v2 = malloc(sizeof(vertex));
-	//v2->index = 2;	
-	//v2->new = true;
-	//v2->next = listHead;	// head to v1 next w v2 wskazuje na v1
-	//listHead = v2;			// head teraz to v2
-
-	//v3 = malloc(sizeof(vertex));
-	//v3->index = 1;
-	//v3->new = true;
-	//v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
-	//listHead = v3;
-
-	// aktualna lista nowych wêz³ów
-	// head->1->2
-
-	adjacencyMatrix = createMatrix();
+	// tu mozna dac tablice wynikow a w ifie ja wypelniac, na koncu drukowac
 
 	// krok 0
 	if (allVertex < 2)
@@ -240,11 +215,36 @@ void Lu_Su_Guo_v2()
 	}
 	else
 	{
+		// krok 0
+		// nowy wierzcho³ek - korzeñ
+		v1 = malloc(sizeof(vertex)); // wskaŸnik
+		v1->index = 0;
+		v1->new = false; // bo to korzeñ
+
+		listHead = v1; // g³owa listy
+
 		// krok 1
-		int i, j;
-		for (i = 0; i < 3; i++)
+
+		v2 = malloc(sizeof(vertex));
+		v2->index = 2;	
+		v2->new = true;
+		v2->next = listHead;	// head to v1 next w v2 wskazuje na v1
+		listHead = v2;			// head teraz to v2
+
+		v3 = malloc(sizeof(vertex));
+		v3->index = 1;
+		v3->new = true;
+		v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
+		listHead = v3;
+
+		// aktualna lista nowych wêz³ów
+		// head->1->2
+
+
+		// wypelnienie macierzy s¹siedztwa dla kroku 1
+		for (int i = 0; i < 3; i++)
 		{
-			for (j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
 			{
 				if (i != j)
 				{
@@ -254,61 +254,125 @@ void Lu_Su_Guo_v2()
 			}
 		}
 
-		//int vertexCounter = 3;	// nie wiem czy bedzie potrzebny
-		int trackIndex = 1;
-		int prevAddedVertex = i - trackIndex;
+		int vertexCounter = 3;
 
-		// krok n (<1)
+		// krok n (> 1)
 		int k = 2;
 		int ancesorIndex = 0;
 		int tempIndex = 0;
 
-		if (allVertex > 3)
+		while (vertexCounter < allVertex)
 		{
-			// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
-			do
+			vTemp = listHead;
+
+			stack* s = createStack();  // na stosie bêd¹ nowe wierzcho³ki
+
+			while (vTemp && vTemp->new == true && vertexCounter < allVertex)
 			{
-				tempIndex = trackIndex;
-				for (j = trackIndex; j <= prevAddedVertex; j++)
+				// tworzymy nowy wierzcho³ek i wrzucamy go na stos
+				v1 = malloc(sizeof(vertex));
+				v1->index = vertexCounter;
+				v1->new = true;
+				v1->next = NULL;
+				vertexCounter++;
+				push(s, v1); // wrzucamy na stos
+
+				// po³¹czenie z rodzicem (jeden wy¿ej)
+				adjacencyMatrix[vTemp->index][v1->index] = 1;
+				adjacencyMatrix[v1->index][vTemp->index] = 1;
+
+				// po³¹czenie z przodkiem
+				ancesorIndex = ((v1->index - 1) / 2) % (k - 1);
+				adjacencyMatrix[v1->index][ancesorIndex] = 1;
+				adjacencyMatrix[ancesorIndex][v1->index] = 1;
+
+				if (vertexCounter < allVertex) // spr czy dodajemy drugi wierzcho³ek
 				{
-					adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-					//polaczenie z przodkiem
-					ancesorIndex = ((i - 1) / 2) % (k - 1);
-					adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+					// tworzymy nowy wierzcho³ek i wrzucamy go na stos
+					v2 = malloc(sizeof(vertex));
+					v2->index = vertexCounter;
+					v2->new = true;
+					v2->next = NULL;
+					vertexCounter++;
+					push(s, v2);
 
-					i++;
-					if (i >= allVertex)
-						break;
+					// po³¹czenie z rodzicem (jeden wy¿ej)
+					adjacencyMatrix[vTemp->index][v2->index] = 1;
+					adjacencyMatrix[v2->index][vTemp->index] = 1;
 
-					adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-					//polaczenie z przodkiem
-					ancesorIndex = ((i - 1) / 2) % (k - 1);
-					adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+					// po³¹czenie z przodkiem
+					ancesorIndex = ((v2->index - 1) / 2) % (k - 1);
+					adjacencyMatrix[v2->index][ancesorIndex] = 1;
+					adjacencyMatrix[ancesorIndex][v2->index] = 1;
 
-					// po³¹czenie miêdzy dodan¹ par¹
-					adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
+					// po³¹czenie 2 nowych ze sob¹ nawzajem
+					adjacencyMatrix[v1->index][v2->index] = 1;
+					adjacencyMatrix[v2->index][v1->index] = 1;
 
-					trackIndex++;
 
-					i++;
-					if (i >= allVertex)
-						break;
 				}
+				vTemp->new = false;
+				vTemp = vTemp->next;  // przechodzimy do kolejnego
+			}
+			k++;
 
-				prevAddedVertex = i - tempIndex;
-				k++;
-
-			} while (i < allVertex);
-
+			while (!empty(s))  // dopóki stos nie jest pusty
+			{
+				v1 = top(s);
+				pop(s);
+				v1->next = listHead;
+				listHead = v1;
+				vTemp = listHead;
+			}
 		}
+
+
+		//if (allVertex > 3)
+		//{
+		//	// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
+		//	do
+		//	{
+		//		tempIndex = trackIndex;
+		//		for (j = trackIndex; j <= prevAddedVertex; j++)
+		//		{
+		//			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
+		//			//polaczenie z przodkiem
+		//			ancesorIndex = ((i - 1) / 2) % (k - 1);
+		//			adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+
+					//i++;
+					//if (i >= allVertex)
+					//	break;
+
+					//adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
+					////polaczenie z przodkiem
+					//ancesorIndex = ((i - 1) / 2) % (k - 1);
+					//adjacencyMatrix[i][ancesorIndex] = adjacencyMatrix[ancesorIndex][i] = 1;
+
+					//// po³¹czenie miêdzy dodan¹ par¹
+					//adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
+
+					//trackIndex++;
+
+		//			i++;
+		//			if (i >= allVertex)
+		//				break;
+		//		}
+
+		//		prevAddedVertex = i - tempIndex;
+		//		k++;
+
+		//	} while (i < allVertex);
+
+		//}
 
 		// macierz jest gotowa, czyli nie potrzebujê tych list powy¿ej (chyba, ¿e bêdzie coœ nie tak, to trzeba siê przyjrzeæ
 		// przepisanie macierzy do list s¹siedztwa
 		adjacencyLists = createAdjacencyLists();
 		matrixToList();
 
-		// TODO algorytm BFS dla list s¹siedztwa (dla macierzy na za du¿¹ z³ozonoœæ czasow¹)
-		// TODO zapisywanie wyników do tablicy
+		// TODO algorytm BFS dla list s¹siedztwa (dla macierzy na za du¿¹ z³ozonoœæ czasow¹) DONE
+		// zapisywanie wyników do tablicy
 		int resultsMemo[1022];	// zapamiêtanie wyników testów, indeks w tablicy to liczba zadanych wierzcho³ków, najwiêksza liczba wierzcho³ków LSG to 1022
 								// to do, spr jaka jest faktycznie najwieksza liczba tych wierzcho³ków?				
 		for (int i = 0; i < 1022; i++)
