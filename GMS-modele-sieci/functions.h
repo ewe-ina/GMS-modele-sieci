@@ -11,10 +11,10 @@
 int allVertex;
 int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
 int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
-struct _adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+
 
 #define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
-//#define DEBUG
+#define DEBUG
 
 
 typedef struct _vertex 
@@ -40,9 +40,12 @@ typedef struct _BFSvertex
 }BFSvertex;
 
 
+adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+
 void getModel(int model);
 
 void Barabasi_Ravasz_Vicsek();
+void Barabasi_Ravasz_Vicsek_v2();
 void Lu_Su_Guo();
 void Lu_Su_Guo_v2();
 void Simplical();
@@ -53,7 +56,7 @@ void Kronecker();
 
 int** createMatrix();
 void deleteMatrix(int** matrix);
-adjacencyListVertex** createAdjacencyLists(); // to te¿ tablica 2 wymiarowa
+adjacencyListVertex** createAdjacencyLists(); 
 void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists);
 
 

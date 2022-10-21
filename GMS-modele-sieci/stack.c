@@ -3,6 +3,8 @@
 stack* createStack()
 {
     stack* s = (stack*)malloc(sizeof(stack));
+    if (s == NULL)
+        return NULL;
     s->top = NULL;
     s->bottom = NULL;
     s->counter = 0;
@@ -36,7 +38,7 @@ vertex* pop(stack* s)
 {
     if (s->bottom == NULL)
     {
-        return -1;
+        return NULL;
     }
 
     snode* temp = s->top;
@@ -56,7 +58,7 @@ vertex* top(stack* s)
 {
     if (s->top == NULL)
     {
-        return -1;
+        return NULL;
     }
     return s->top->v;
 }
