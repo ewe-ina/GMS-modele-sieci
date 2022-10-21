@@ -9,11 +9,11 @@
 #include "stack.h"
 
 int allVertex;
-int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
-int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
+short** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
+short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
 
 
-#define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
+#define MAXVAL  SHRT_MAX / 3  // imituje nieskonczonosc w algorytmie
 //#define DEBUG
 
 
@@ -54,14 +54,14 @@ void DCN();
 void GFG();
 void Kronecker();
 
-int** createMatrix();
-void deleteMatrix(int** matrix);
+short** createMatrix();
+void deleteMatrix(short** matrix);
 adjacencyListVertex** createAdjacencyLists(); 
 void deleteAdjacencyLists(adjacencyListVertex** adjcLists);
 
 
-void addInfinity(int** distanceMatrix);
-void Floyd_Warshall(int** distanceMatrix);
+void addInfinity(short** distanceMatrix);
+void Floyd_Warshall(short** distanceMatrix);
 
 void matrixToList();
 
@@ -71,7 +71,7 @@ BFSvertex* BFS(int start);
 // POMOCNICZE
 #ifdef DEBUG
 void matrixForTest();
-void printMatrix(int** matrix);
+void printMatrix(short** matrix);
 void printAdjacencyList();
 #endif // DEBUG
 

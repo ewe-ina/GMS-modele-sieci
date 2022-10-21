@@ -5,6 +5,8 @@
 queue *createQueue()
 {
     queue* q = (queue*)malloc(sizeof(queue));
+    if (q == NULL)
+        return NULL;
     q->head = NULL;
     q->tail = NULL;
     q->counter = 0;

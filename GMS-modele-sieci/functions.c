@@ -46,7 +46,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
 
 	allVertex = 1; // wêze³ w kroku 0
 
@@ -85,9 +85,9 @@ void Barabasi_Ravasz_Vicsek_v2()
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
 
 	// krok 0
-	int i = 0;
-	int j = 0;
-	int copyVertex = 0;
+	short i = 0;
+	short j = 0;
+	short copyVertex = 0;
 
 	// krok 1
 	if (k > 0)
@@ -104,9 +104,9 @@ void Barabasi_Ravasz_Vicsek_v2()
 	// krok >=2
 	if (k > 1)
 	{
-		int copyIndex_i = 0;
-		int copyIndex_j = 0;
-		int prevCopyIndex = 0;
+		short copyIndex_i = 0;
+		short copyIndex_j = 0;
+		short prevCopyIndex = 0;
 
 		for (int step = 2; step <= k; step++)
 		{
@@ -236,9 +236,9 @@ void Barabasi_Ravasz_Vicsek()
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
 
 	// krok 0
-	int i = 0;
-	int j = 0;
-	int copyVertex = 0;
+	short i = 0;
+	short j = 0;
+	short copyVertex = 0;
 
 	// krok 1
 	if (k > 0)
@@ -255,9 +255,9 @@ void Barabasi_Ravasz_Vicsek()
 	// krok >=2
 	if (k > 1)
 	{
-		int copyIndex_i = 0;
-		int copyIndex_j = 0;
-		int prevCopyIndex = 0;
+		short copyIndex_i = 0;
+		short copyIndex_j = 0;
+		short prevCopyIndex = 0;
 
 		for (int step = 2; step <= k; step++)
 		{
@@ -536,7 +536,7 @@ void Lu_Su_Guo()
 	else
 	{
 		// krok 1
-		int i, j;
+		short i, j;
 		for (i = 0; i < 3; i++)
 		{
 			for (j = 0; j < 3; j++)
@@ -551,8 +551,8 @@ void Lu_Su_Guo()
 			}
 		}
 
-		int trackIndex = 1;
-		int prevAddedVertex = i - trackIndex;
+		short trackIndex = 1;
+		short prevAddedVertex = i - trackIndex;
 #ifdef DEBUG
 		printf("trackIndex = %i\nliczba ostatnio dodanych wierzchow = %i\n", trackIndex, prevAddedVertex);
 #endif // DEBUG
@@ -561,12 +561,12 @@ void Lu_Su_Guo()
 		if (allVertex > 3)
 		{
 			int k = 2;
-			int ancesorIndex = 0;
+			short ancesorIndex = 0;
 			
 			// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
 			do
 			{
-				int tempIndex = 0;
+				short tempIndex = 0;
 				tempIndex = trackIndex;
 				for (j = trackIndex; j <= prevAddedVertex; j++)
 				{
@@ -669,19 +669,19 @@ void Kronecker()
 
 }
 
-int** createMatrix()
+short** createMatrix()
 {
-	int** matrix = (int**)calloc(allVertex, sizeof(int*));   // calloc od razu inicjalizuje 0
+	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
 	if (matrix != NULL)
 	{
 		for (int i = 0; i < allVertex; ++i)
-			matrix[i] = (int*)calloc(allVertex, sizeof(int));
+			matrix[i] = (short*)calloc(allVertex, sizeof(short));
 	}
 
 	return matrix;
 }
 
-void deleteMatrix(int** matrix)
+void deleteMatrix(short** matrix)
 {
 	if (matrix != NULL)
 	{
@@ -707,7 +707,7 @@ void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
 }
 
 
-void addInfinity(int** distanceMatrix)
+void addInfinity(short** distanceMatrix)
 {
 	for (int i = 0; i < allVertex; i++)
 	{
@@ -721,9 +721,9 @@ void addInfinity(int** distanceMatrix)
 	}
 }
 
-void Floyd_Warshall(int** distanceMatrix)
+void Floyd_Warshall(short** distanceMatrix)
 {
-	long long int result = 0;
+	int result = 0;
 
 	for (int u = 0; u < allVertex; u++)
 	{
@@ -758,7 +758,7 @@ void Floyd_Warshall(int** distanceMatrix)
 	printf("Result = %lli\n", result);
 	printMatrix(distanceMatrix);
 #else
-	printf("%lli\n", result);
+	printf("%i\n", result);
 #endif // DEBUG
 
 	
@@ -920,7 +920,7 @@ void matrixForTest()
 	deleteMatrix(indexMatrix);
 }
 
-void printMatrix(int** matrix)
+void printMatrix(short** matrix)
 {
 	if (matrix != NULL)
 	{
