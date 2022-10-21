@@ -24,13 +24,6 @@ typedef struct _vertex
 	struct _vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
 }vertex;
 
-// do Lu-Su-Guo_v2
-typedef struct _adjacencyListVertex		// wierzcholek przechowywany w liscie sasiedztwa
-{
-	int index;							// indeks wierzcho³ka
-	bool bottom;						// czy jest dolnym wierzcho³kiem?
-	struct _adjacencyListVertex *next;	// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa 
-}adjacencyListVertex;
 
 // do BFS
 typedef struct _BFSvertex 
@@ -40,7 +33,7 @@ typedef struct _BFSvertex
 }BFSvertex;
 
 
-adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+vertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 void getModel(int model);
 
@@ -56,8 +49,8 @@ void Kronecker();
 
 short** createMatrix();
 void deleteMatrix(short** matrix);
-adjacencyListVertex** createAdjacencyLists(); 
-void deleteAdjacencyLists(adjacencyListVertex** adjcLists);
+vertex** createAdjacencyLists(); 
+void deleteAdjacencyLists(vertex** adjcLists);
 
 
 void addInfinity(short** distanceMatrix);

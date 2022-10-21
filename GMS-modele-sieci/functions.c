@@ -47,6 +47,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 	printf("k = %i\n", k);
 #endif // DEBUG
 	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // wêze³ w kroku 0
 
@@ -78,7 +79,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
 
-	// TODO: zbudowaæ graf --> macierz s¹siedztwa i macieæ identyfikatorów
+	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
 	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
 	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
@@ -228,7 +229,7 @@ void Barabasi_Ravasz_Vicsek()
 	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
 
-	// TODO: zbudowaæ graf --> macierz s¹siedztwa i macieæ identyfikatorów
+	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
 	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
 	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
@@ -336,8 +337,8 @@ void Lu_Su_Guo_v2()
 	vertex* vTemp;
 	vertex* listHead;	// wskaŸnik na listê nowych wêz³ów
 
-	//adjacencyListVertex** adjacencyList;	//tablica wskaŸników
-	//adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
+	//vertex** adjacencyList;	//tablica wskaŸników
+	//vertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
 
 	adjacencyMatrix = createMatrix();	// pusta macierz s¹siedztwa
 
@@ -657,15 +658,14 @@ void DCN()
 
 	adjacencyMatrix = createMatrix();
 	adjacencyLists = createAdjacencyLists();
-	adjacencyListVertex* v;
+	vertex* v;
 
 	// krok 0
 	// nowy wierzcho³ek - korzeñ
-	v = malloc(sizeof(adjacencyListVertex)); // wskaŸnik
+	v = malloc(sizeof(vertex)); // wskaŸnik
 	if (v == NULL)
 		return;
 	v->index = 0;
-	v->bottom = true;
 	v->next = NULL;
 
 	// lista s¹siedztwa - v0 na razie brak s¹siadów, reszta - ka¿dy ma za s¹siada v0
@@ -700,11 +700,10 @@ void DCN()
 		int index = throughAncestors[i];
 		while (index != 0)
 		{
-			v = malloc(sizeof(adjacencyListVertex));
+			v = malloc(sizeof(vertex));
 			if (v == NULL)
 				break;
 			v->index = index;
-			v->bottom = false; //?
 			v->next = adjacencyLists[i];
 			adjacencyLists[i] = v;
 			index = throughAncestors[index];
@@ -786,18 +785,18 @@ void deleteMatrix(short** matrix)
 }
 
 
-adjacencyListVertex** createAdjacencyLists()
+vertex** createAdjacencyLists()
 {
-	adjacencyListVertex**  adjcLists = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
+	vertex**  adjcLists = (vertex**)calloc(allVertex, sizeof(vertex*));
 	return adjcLists;
 }
 
-void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
+void deleteAdjacencyLists(vertex** adjcLists)
 {
 	if (adjcLists != NULL)
 	{
-		adjacencyListVertex* v;
-		adjacencyListVertex* vDelete;
+		vertex* v;
+		vertex* vDelete;
 		for (int i = 0; i < allVertex; i++)
 		{
 			v = adjacencyLists[i];
@@ -883,7 +882,7 @@ void matrixToList()
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
-				adjacencyListVertex* v = malloc(sizeof(adjacencyListVertex));
+				vertex* v = malloc(sizeof(vertex));
 				if (v == NULL)
 					return;
 				v->index = j;
@@ -919,7 +918,7 @@ int countDistances()
 
 BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 {
-	adjacencyListVertex* v;
+	vertex* v;
 	BFSvertex* tab = malloc(sizeof(BFSvertex) * allVertex);
 
 	if (tab == NULL)
@@ -1045,7 +1044,7 @@ void printAdjacencyList()
 {
 	for (int i = 0; i < allVertex; i++)
 	{
-		adjacencyListVertex* ptr = adjacencyLists[i];
+		vertex* ptr = adjacencyLists[i];
 
 		//start from the beginning
 		printf("[%d]", i);
