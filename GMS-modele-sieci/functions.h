@@ -9,11 +9,11 @@
 #include "stack.h"
 
 int allVertex;
-int** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
-int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
-struct _adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+short** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
+short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
 
-#define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
+
+#define MAXVAL  SHRT_MAX / 3  // imituje nieskonczonosc w algorytmie
 //#define DEBUG
 
 
@@ -40,9 +40,12 @@ typedef struct _BFSvertex
 }BFSvertex;
 
 
+adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+
 void getModel(int model);
 
 void Barabasi_Ravasz_Vicsek();
+void Barabasi_Ravasz_Vicsek_v2();
 void Lu_Su_Guo();
 void Lu_Su_Guo_v2();
 void Simplical();
@@ -51,14 +54,14 @@ void DCN();
 void GFG();
 void Kronecker();
 
-int** createMatrix();
-void deleteMatrix(int** matrix);
-adjacencyListVertex** createAdjacencyLists(); // to te¿ tablica 2 wymiarowa
-void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists);
+short** createMatrix();
+void deleteMatrix(short** matrix);
+adjacencyListVertex** createAdjacencyLists(); 
+void deleteAdjacencyLists(adjacencyListVertex** adjcLists);
 
 
-void addInfinity(int** distanceMatrix);
-void Floyd_Warshall(int** distanceMatrix);
+void addInfinity(short** distanceMatrix);
+void Floyd_Warshall(short** distanceMatrix);
 
 void matrixToList();
 
@@ -66,8 +69,10 @@ int countDistances();
 BFSvertex* BFS(int start);
 
 // POMOCNICZE
+#ifdef DEBUG
 void matrixForTest();
-void printMatrix(int** matrix);
+void printMatrix(short** matrix);
 void printAdjacencyList();
+#endif // DEBUG
 
 #endif // !FUNCTIONS_H

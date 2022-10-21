@@ -8,7 +8,8 @@ void getModel(int model)
 	switch (model)
 	{
 	case 0:
-		Barabasi_Ravasz_Vicsek();
+		//Barabasi_Ravasz_Vicsek();
+		Barabasi_Ravasz_Vicsek_v2();
 		break;
 	case 1:
 		//Lu_Su_Guo();
@@ -34,6 +35,157 @@ void getModel(int model)
 	}
 }
 
+void Barabasi_Ravasz_Vicsek_v2()
+{
+#ifdef DEBUG
+	printf("Barabasi-Ravasz-Vicsek\n");
+#endif // DEBUG
+
+	int k = 0;
+	scanf_s("%i", &k);
+#ifdef DEBUG
+	printf("k = %i\n", k);
+#endif // DEBUG
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+
+	allVertex = 1; // wêze³ w kroku 0
+
+	// LICZBA WIERZCHO£KÓW 
+	if (k > 0)
+	{
+		for (int i = 0; i < k; i++)
+			allVertex = allVertex * 3;
+	}
+#ifdef DEBUG
+	printf("Liczba wierzcholkow: %i\n", allVertex);
+
+
+	// LICZBA KRAWEÊDZI                 
+	if (k > 0)
+	{
+		int m = 0;
+		int j = 1;
+		for (int i = 0; i < k; i++)
+		{
+			j = j * 2;
+			m = m * 3 + j;
+		}
+	}
+
+	printf("Liczba krawedzi: %i\n", m);
+#endif // DEBUG
+
+
+	adjacencyMatrix = createMatrix();
+	indexMatrix = createMatrix();
+
+	// TODO: zbudowaæ graf --> macierz s¹siedztwa i macieæ identyfikatorów
+	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
+	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
+	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
+
+	// krok 0
+	short i = 0;
+	short j = 0;
+	short copyVertex = 0;
+
+	// krok 1
+	if (k > 0)
+	{
+		for (i = 1; i < 3; i++)
+		{
+			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
+			indexMatrix[i][j] = i;
+			indexMatrix[j][i] = j;
+		}
+		copyVertex = 3;
+	}
+
+	// krok >=2
+	if (k > 1)
+	{
+		short copyIndex_i = 0;
+		short copyIndex_j = 0;
+		short prevCopyIndex = 0;
+
+		for (int step = 2; step <= k; step++)
+		{
+			for (i = 0; i < copyVertex; i++)
+			{
+				for (j = 0; j < copyVertex; j++)
+				{
+#ifdef DEBUG
+					if (i >= allVertex || j >= allVertex)
+						printf("i = %i, j = %i\n", i, j);
+#endif // DEBUG
+
+					if (adjacencyMatrix[i][j] == 1)
+					{
+						copyIndex_i = i + copyVertex;
+						copyIndex_j = j + copyVertex;
+#ifdef DEBUG
+						if(copyIndex_i >= allVertex || copyIndex_j >= allVertex)
+							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
+#endif // DEBUG
+						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
+						indexMatrix[copyIndex_i][copyIndex_j] = 1;
+
+						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
+						{
+							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
+							indexMatrix[0][copyIndex_j] = 0;
+							indexMatrix[copyIndex_j][0] = copyIndex_j;
+						}
+
+						copyIndex_i += copyVertex;
+						copyIndex_j += copyVertex;
+#ifdef DEBUG
+						if (copyIndex_i >= allVertex || copyIndex_j >= allVertex)
+							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
+#endif // DEBUG
+						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
+						indexMatrix[copyIndex_i][copyIndex_j] = 1;
+
+#ifdef DEBUG
+						if (j >= allVertex)
+							printf("j = %i\n", j);
+#endif // DEBUG
+						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
+						{
+							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
+							indexMatrix[0][copyIndex_j] = 0;
+							indexMatrix[copyIndex_j][0] = copyIndex_j;
+						}
+					}
+				}
+			}
+
+			// dolne z korzeniem - DONE WYZEJ
+			// czyli te, które do³o¿one w poprzednim kroku by³y po³¹czone z korzeniem, z przesuniêciem o copyVertex i 2*copyVertex
+			// czyli zaczynami nie od 0, a od prevCopyIndex;
+
+
+			// na koñcu pêtli
+			prevCopyIndex = copyVertex;
+			copyVertex *= 3;
+		}
+	}
+
+	// przepisanie macierzy do list s¹siedztwa
+	adjacencyLists = createAdjacencyLists();
+	matrixToList();
+
+	int distanceSum = 0;
+	distanceSum = countDistances();
+
+	printf("%i\n", distanceSum);
+
+
+	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(indexMatrix);
+
+}
+
 void Barabasi_Ravasz_Vicsek()
 {
 #ifdef DEBUG
@@ -57,13 +209,12 @@ void Barabasi_Ravasz_Vicsek()
 	}
 #ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
-#endif // DEBUG
 
 
-	// LICZBA KRAWEÊDZI                 
-	int m = 0;
+	// LICZBA KRAWÊDZI                 
 	if (k > 0)
 	{
+		int m = 0;
 		int j = 1;
 		for (int i = 0; i < k; i++) 
 		{
@@ -71,7 +222,7 @@ void Barabasi_Ravasz_Vicsek()
 			m = m * 3 + j;
 		}
 	}
-#ifdef DEBUG
+
 	printf("Liczba krawedzi: %i\n", m);
 #endif // DEBUG
 
@@ -85,13 +236,9 @@ void Barabasi_Ravasz_Vicsek()
 	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
 
 	// krok 0
-	int i = 0;
-	int j = 0;
-	int copyVertex = 0;
-	int copyIndex_i = 0;
-	int copyIndex_j = 0;
-	int prevCopyIndex = 0;
-	//int prevCopyIndex_j = 0;
+	short i = 0;
+	short j = 0;
+	short copyVertex = 0;
 
 	// krok 1
 	if (k > 0)
@@ -108,11 +255,15 @@ void Barabasi_Ravasz_Vicsek()
 	// krok >=2
 	if (k > 1)
 	{
+		short copyIndex_i = 0;
+		short copyIndex_j = 0;
+		short prevCopyIndex = 0;
+
 		for (int step = 2; step <= k; step++)
 		{
-			for (int i = 0; i < copyVertex; i++)
+			for (i = 0; i < copyVertex; i++)
 			{
-				for (int j = 0; j < copyVertex; j++)
+				for (j = 0; j < copyVertex; j++)
 				{
 					if (adjacencyMatrix[i][j] == 1)
 					{
@@ -155,16 +306,6 @@ void Barabasi_Ravasz_Vicsek()
 
 		// przejœæ po ca³ej distanceMartix, jeœli nie ma krawêdzi oraz i != j to nieskoñczonoœæ
 		addInfinity(adjacencyMatrix);
-		/*for (int i = 0; i < allVertex; i++)
-		{
-			for (int j = 0; j < allVertex; j++)
-			{
-				if (i != j && distanceMatrix[i][j] == 0)
-				{
-					distanceMatrix[i][j] = MAXVAL;
-				}
-			}
-		}*/
 	}
 	
 
@@ -198,7 +339,7 @@ void Lu_Su_Guo_v2()
 	vertex* listHead;	// wskaŸnik na listê nowych wêz³ów
 
 	//adjacencyListVertex** adjacencyList;	//tablica wskaŸników
-	adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
+	//adjacencyListVertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
 
 	adjacencyMatrix = createMatrix();	// pusta macierz s¹siedztwa
 
@@ -218,6 +359,8 @@ void Lu_Su_Guo_v2()
 		// krok 0
 		// nowy wierzcho³ek - korzeñ
 		v1 = malloc(sizeof(vertex)); // wskaŸnik
+		if (v1 == NULL)
+			return;
 		v1->index = 0;
 		v1->new = false; // bo to korzeñ
 
@@ -226,12 +369,16 @@ void Lu_Su_Guo_v2()
 		// krok 1
 
 		v2 = malloc(sizeof(vertex));
+		if (v2 == NULL)
+			return;
 		v2->index = 2;	
 		v2->new = true;
 		v2->next = listHead;	// head to v1 next w v2 wskazuje na v1
 		listHead = v2;			// head teraz to v2
 
 		v3 = malloc(sizeof(vertex));
+		if (v3 == NULL)
+			return;
 		v3->index = 1;
 		v3->new = true;
 		v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
@@ -259,7 +406,7 @@ void Lu_Su_Guo_v2()
 		// krok n (> 1)
 		int k = 2;
 		int ancesorIndex = 0;
-		int tempIndex = 0;
+		//int tempIndex = 0;
 
 		while (vertexCounter < allVertex)
 		{
@@ -271,6 +418,8 @@ void Lu_Su_Guo_v2()
 			{
 				// tworzymy nowy wierzcho³ek i wrzucamy go na stos
 				v1 = malloc(sizeof(vertex));
+				if (v1 == NULL)
+					return;
 				v1->index = vertexCounter;
 				v1->new = true;
 				v1->next = NULL;
@@ -290,6 +439,8 @@ void Lu_Su_Guo_v2()
 				{
 					// tworzymy nowy wierzcho³ek i wrzucamy go na stos
 					v2 = malloc(sizeof(vertex));
+					if (v2 == NULL)
+						return;
 					v2->index = vertexCounter;
 					v2->new = true;
 					v2->next = NULL;
@@ -385,7 +536,7 @@ void Lu_Su_Guo()
 	else
 	{
 		// krok 1
-		int i, j;
+		short i, j;
 		for (i = 0; i < 3; i++)
 		{
 			for (j = 0; j < 3; j++)
@@ -400,22 +551,22 @@ void Lu_Su_Guo()
 			}
 		}
 
-		int trackIndex = 1;
-		int prevAddedVertex = i - trackIndex;
+		short trackIndex = 1;
+		short prevAddedVertex = i - trackIndex;
 #ifdef DEBUG
 		printf("trackIndex = %i\nliczba ostatnio dodanych wierzchow = %i\n", trackIndex, prevAddedVertex);
 #endif // DEBUG
 
 		// krok n (<1)
-		int k = 2;
-		int ancesorIndex = 0;
-		int tempIndex = 0;
-
 		if (allVertex > 3)
 		{
+			int k = 2;
+			short ancesorIndex = 0;
+			
 			// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
 			do
 			{
+				short tempIndex = 0;
 				tempIndex = trackIndex;
 				for (j = trackIndex; j <= prevAddedVertex; j++)
 				{
@@ -518,31 +669,19 @@ void Kronecker()
 
 }
 
-int** createMatrix()
+short** createMatrix()
 {
-	int** matrix = (int**)calloc(allVertex, sizeof(int*));
+	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
 	if (matrix != NULL)
 	{
 		for (int i = 0; i < allVertex; ++i)
-			matrix[i] = (int*)calloc(allVertex, sizeof(int));
-	}
-
-	for (int i = 0; i < allVertex; i++) // TO RACZEJ NIEPOTRZEBNE
-	{
-		for (int j = 0; j < allVertex; j++)
-		{
-			
-			if (matrix != NULL && *matrix != NULL)
-			{
-			matrix[i][j] = 0;
-			}
-		}
+			matrix[i] = (short*)calloc(allVertex, sizeof(short));
 	}
 
 	return matrix;
 }
 
-void deleteMatrix(int** matrix)
+void deleteMatrix(short** matrix)
 {
 	if (matrix != NULL)
 	{
@@ -555,20 +694,20 @@ void deleteMatrix(int** matrix)
 
 adjacencyListVertex** createAdjacencyLists()
 {
-	adjacencyListVertex** tab = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
-	return tab;
+	adjacencyListVertex**  adjcLists = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
+	return adjcLists;
 }
 
-void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists)
+void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
 {
-	if (adjacencyLists != NULL)
+	if (adjcLists != NULL)
 	{
-		free(adjacencyLists);
+		free(adjcLists);
 	}
 }
 
 
-void addInfinity(int** distanceMatrix)
+void addInfinity(short** distanceMatrix)
 {
 	for (int i = 0; i < allVertex; i++)
 	{
@@ -582,9 +721,9 @@ void addInfinity(int** distanceMatrix)
 	}
 }
 
-void Floyd_Warshall(int** distanceMatrix)
+void Floyd_Warshall(short** distanceMatrix)
 {
-	long long int result = 0;
+	int result = 0;
 
 	for (int u = 0; u < allVertex; u++)
 	{
@@ -619,7 +758,7 @@ void Floyd_Warshall(int** distanceMatrix)
 	printf("Result = %lli\n", result);
 	printMatrix(distanceMatrix);
 #else
-	printf("%lli\n", result);
+	printf("%i\n", result);
 #endif // DEBUG
 
 	
@@ -629,7 +768,7 @@ void Floyd_Warshall(int** distanceMatrix)
 void matrixToList() 
 {
 #ifdef DEBUG
-	printMatrix(adjacencyMatrix);
+	//printMatrix(adjacencyMatrix);
 #endif // DEBUG
 
 	for (int i = allVertex - 1; i >= 0; i--) 
@@ -638,7 +777,9 @@ void matrixToList()
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
-				adjacencyListVertex* v = malloc(sizeof(adjacencyListVertex));				
+				adjacencyListVertex* v = malloc(sizeof(adjacencyListVertex));
+				if (v == NULL)
+					return;
 				v->index = j;
 				//v->bottom = false;
 				v->next = adjacencyLists[i];
@@ -647,7 +788,7 @@ void matrixToList()
 		}
 	}
 #ifdef DEBUG
-	printAdjacencyList();
+	//printAdjacencyList();
 #endif // DEBUG
 
 }
@@ -674,6 +815,10 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 {
 	adjacencyListVertex* v;
 	BFSvertex* tab = malloc(sizeof(BFSvertex) * allVertex);
+
+	if (tab == NULL)
+		return NULL;
+
 	for (int i = 0; i < allVertex; i++) 
 	{
 		tab[i].distance = MAXVAL;
@@ -710,6 +855,7 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 }
 
 // POMOCNICZE
+#ifdef DEBUG
 void matrixForTest()
 {
 	// dla wejœcia: 1 6 | wyjscie: 20
@@ -774,7 +920,7 @@ void matrixForTest()
 	deleteMatrix(indexMatrix);
 }
 
-void printMatrix(int** matrix)
+void printMatrix(short** matrix)
 {
 	if (matrix != NULL)
 	{
@@ -806,3 +952,4 @@ void printAdjacencyList()
 		printf("\n");
 	}
 }
+#endif // DEBUG
