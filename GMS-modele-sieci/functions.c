@@ -796,19 +796,19 @@ void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
 {
 	if (adjcLists != NULL)
 	{
-		//adjacencyListVertex* v;
-		//adjacencyListVertex* vDelete;
-		//for (int i = 0; i < allVertex; i++)
-		//{
-		//	v = adjacencyLists[i];
-		//	while (v)
-		//	{
-		//		vDelete = v;
-		//		v = v->next;
-		//		free(vDelete);
-		//	}
-		//}
-		free(adjcLists);
+		adjacencyListVertex* v;
+		adjacencyListVertex* vDelete;
+		for (int i = 0; i < allVertex; i++)
+		{
+			v = adjacencyLists[i];
+			while (v)
+			{
+				vDelete = v;
+				v = v->next;
+				free(vDelete);
+			}
+		}
+		//free(adjcLists);  // ju¿ wy¿ej zwolniliœmy wskaŸniki, które s¹ bezpoœrednio w tablicy
 	}
 }
 
