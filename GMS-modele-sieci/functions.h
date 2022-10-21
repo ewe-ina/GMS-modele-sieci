@@ -14,7 +14,7 @@ int** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz
 
 
 #define MAXVAL  INT_MAX / 3  // imituje nieskonczonosc w algorytmie
-#define DEBUG
+//#define DEBUG
 
 
 typedef struct _vertex 
@@ -57,7 +57,7 @@ void Kronecker();
 int** createMatrix();
 void deleteMatrix(int** matrix);
 adjacencyListVertex** createAdjacencyLists(); 
-void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists);
+void deleteAdjacencyLists(adjacencyListVertex** adjcLists);
 
 
 void addInfinity(int** distanceMatrix);
@@ -69,8 +69,10 @@ int countDistances();
 BFSvertex* BFS(int start);
 
 // POMOCNICZE
+#ifdef DEBUG
 void matrixForTest();
 void printMatrix(int** matrix);
 void printAdjacencyList();
+#endif // DEBUG
 
 #endif // !FUNCTIONS_H

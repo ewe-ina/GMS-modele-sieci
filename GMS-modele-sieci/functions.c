@@ -46,7 +46,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	//if (k > 6) return;  // BEZPIECZNIK
+	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
 
 	allVertex = 1; // wêze³ w kroku 0
 
@@ -58,13 +58,12 @@ void Barabasi_Ravasz_Vicsek_v2()
 	}
 #ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
-#endif // DEBUG
 
 
 	// LICZBA KRAWEÊDZI                 
-	int m = 0;
 	if (k > 0)
 	{
+		int m = 0;
 		int j = 1;
 		for (int i = 0; i < k; i++)
 		{
@@ -72,7 +71,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 			m = m * 3 + j;
 		}
 	}
-#ifdef DEBUG
+
 	printf("Liczba krawedzi: %i\n", m);
 #endif // DEBUG
 
@@ -89,10 +88,6 @@ void Barabasi_Ravasz_Vicsek_v2()
 	int i = 0;
 	int j = 0;
 	int copyVertex = 0;
-	int copyIndex_i = 0;
-	int copyIndex_j = 0;
-	int prevCopyIndex = 0;
-	//int prevCopyIndex_j = 0;
 
 	// krok 1
 	if (k > 0)
@@ -109,11 +104,15 @@ void Barabasi_Ravasz_Vicsek_v2()
 	// krok >=2
 	if (k > 1)
 	{
+		int copyIndex_i = 0;
+		int copyIndex_j = 0;
+		int prevCopyIndex = 0;
+
 		for (int step = 2; step <= k; step++)
 		{
-			for (int i = 0; i < copyVertex; i++)
+			for (i = 0; i < copyVertex; i++)
 			{
-				for (int j = 0; j < copyVertex; j++)
+				for (j = 0; j < copyVertex; j++)
 				{
 #ifdef DEBUG
 					if (i >= allVertex || j >= allVertex)
@@ -149,7 +148,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 
 #ifdef DEBUG
 						if (j >= allVertex)
-							printf("j = %i = %i\n", j);
+							printf("j = %i\n", j);
 #endif // DEBUG
 						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
@@ -210,13 +209,12 @@ void Barabasi_Ravasz_Vicsek()
 	}
 #ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
-#endif // DEBUG
 
 
-	// LICZBA KRAWEÊDZI                 
-	int m = 0;
+	// LICZBA KRAWÊDZI                 
 	if (k > 0)
 	{
+		int m = 0;
 		int j = 1;
 		for (int i = 0; i < k; i++) 
 		{
@@ -224,7 +222,7 @@ void Barabasi_Ravasz_Vicsek()
 			m = m * 3 + j;
 		}
 	}
-#ifdef DEBUG
+
 	printf("Liczba krawedzi: %i\n", m);
 #endif // DEBUG
 
@@ -241,10 +239,6 @@ void Barabasi_Ravasz_Vicsek()
 	int i = 0;
 	int j = 0;
 	int copyVertex = 0;
-	int copyIndex_i = 0;
-	int copyIndex_j = 0;
-	int prevCopyIndex = 0;
-	//int prevCopyIndex_j = 0;
 
 	// krok 1
 	if (k > 0)
@@ -261,11 +255,15 @@ void Barabasi_Ravasz_Vicsek()
 	// krok >=2
 	if (k > 1)
 	{
+		int copyIndex_i = 0;
+		int copyIndex_j = 0;
+		int prevCopyIndex = 0;
+
 		for (int step = 2; step <= k; step++)
 		{
-			for (int i = 0; i < copyVertex; i++)
+			for (i = 0; i < copyVertex; i++)
 			{
-				for (int j = 0; j < copyVertex; j++)
+				for (j = 0; j < copyVertex; j++)
 				{
 					if (adjacencyMatrix[i][j] == 1)
 					{
@@ -408,7 +406,7 @@ void Lu_Su_Guo_v2()
 		// krok n (> 1)
 		int k = 2;
 		int ancesorIndex = 0;
-		int tempIndex = 0;
+		//int tempIndex = 0;
 
 		while (vertexCounter < allVertex)
 		{
@@ -560,15 +558,15 @@ void Lu_Su_Guo()
 #endif // DEBUG
 
 		// krok n (<1)
-		int k = 2;
-		int ancesorIndex = 0;
-		int tempIndex = 0;
-
 		if (allVertex > 3)
 		{
+			int k = 2;
+			int ancesorIndex = 0;
+			
 			// to lacznie z przodkami w duzej petli do --tu break?-- while (i < allVertex)
 			do
 			{
+				int tempIndex = 0;
 				tempIndex = trackIndex;
 				for (j = trackIndex; j <= prevAddedVertex; j++)
 				{
@@ -673,23 +671,11 @@ void Kronecker()
 
 int** createMatrix()
 {
-	int** matrix = (int**)calloc(allVertex, sizeof(int*));
+	int** matrix = (int**)calloc(allVertex, sizeof(int*));   // calloc od razu inicjalizuje 0
 	if (matrix != NULL)
 	{
 		for (int i = 0; i < allVertex; ++i)
 			matrix[i] = (int*)calloc(allVertex, sizeof(int));
-	}
-
-	for (int i = 0; i < allVertex; i++) // TO RACZEJ NIEPOTRZEBNE
-	{
-		for (int j = 0; j < allVertex; j++)
-		{
-			
-			if (matrix != NULL && *matrix != NULL)
-			{
-			matrix[i][j] = 0;
-			}
-		}
 	}
 
 	return matrix;
@@ -708,15 +694,15 @@ void deleteMatrix(int** matrix)
 
 adjacencyListVertex** createAdjacencyLists()
 {
-	adjacencyLists = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
-	return adjacencyLists;
+	adjacencyListVertex**  adjcLists = (adjacencyListVertex**)calloc(allVertex, sizeof(adjacencyListVertex*));
+	return adjcLists;
 }
 
-void deleteAdjacencyLists(adjacencyListVertex** adjacencyLists)
+void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
 {
-	if (adjacencyLists != NULL)
+	if (adjcLists != NULL)
 	{
-		free(adjacencyLists);
+		free(adjcLists);
 	}
 }
 
@@ -869,6 +855,7 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 }
 
 // POMOCNICZE
+#ifdef DEBUG
 void matrixForTest()
 {
 	// dla wejœcia: 1 6 | wyjscie: 20
@@ -965,3 +952,4 @@ void printAdjacencyList()
 		printf("\n");
 	}
 }
+#endif // DEBUG
