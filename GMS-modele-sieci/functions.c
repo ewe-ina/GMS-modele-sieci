@@ -59,11 +59,10 @@ void Barabasi_Ravasz_Vicsek_v2()
 #ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
 
-
+	int m = 0;
 	// LICZBA KRAWEÊDZI                 
 	if (k > 0)
 	{
-		int m = 0;
 		int j = 1;
 		for (int i = 0; i < k; i++)
 		{
@@ -210,11 +209,10 @@ void Barabasi_Ravasz_Vicsek()
 #ifdef DEBUG
 	printf("Liczba wierzcholkow: %i\n", allVertex);
 
-
+	int m = 0;
 	// LICZBA KRAWÊDZI                 
 	if (k > 0)
 	{
-		int m = 0;
 		int j = 1;
 		for (int i = 0; i < k; i++) 
 		{
@@ -652,6 +650,102 @@ void DCN()
 	printf("DCN\n");
 #endif // DEBUG
 	
+	scanf_s("%i", &allVertex);
+#ifdef DEBUG
+	printf("liczba wierzcholkow = %i\n", allVertex);
+#endif // DEBUG
+
+	adjacencyMatrix = createMatrix();
+	adjacencyLists = createAdjacencyLists();
+	adjacencyListVertex* v;
+
+	// krok 0
+	// nowy wierzcho³ek - korzeñ
+	v = malloc(sizeof(adjacencyListVertex)); // wskaŸnik
+	if (v == NULL)
+		return;
+	v->index = 0;
+	v->bottom = true;
+	v->next = NULL;
+
+	// lista s¹siedztwa - v0 na razie brak s¹siadów, reszta - ka¿dy ma za s¹siada v0
+	adjacencyLists[0] = NULL;
+	for (int i = 1; i < allVertex; i++)
+	{
+		adjacencyLists[i] = v;
+	}
+
+	// zliczenie odleg³oœci od ka¿dego po przodkach do v0 - póŸniej siê to przyda
+	//int* throughAncestors = (int*)calloc(allVertex, sizeof(int));
+	int throughAncestors[1022];
+	for (int i = 0; i < 1022; i++)
+	{
+		throughAncestors[i] = 0;
+	}
+
+	for (int i = 3; i < allVertex; i++)
+	{
+		if (i % 2 == 1)
+		{
+			throughAncestors[i] = i / 2;
+		}
+		else
+		{
+			throughAncestors[i] = (i - 1) / 2;
+		}
+	}
+
+	for (int i = 3; i < allVertex; i++)
+	{
+		int index = throughAncestors[i];
+		while (index != 0)
+		{
+			v = malloc(sizeof(adjacencyListVertex));
+			if (v == NULL)
+				break;
+			v->index = index;
+			v->bottom = false; //?
+			v->next = adjacencyLists[i];
+			adjacencyLists[i] = v;
+			index = throughAncestors[index];
+		}
+	}
+
+	for (int i = 0; i < allVertex; i++)
+	{
+		v = adjacencyLists[i];
+		while (v)
+		{
+			adjacencyMatrix[i][v->index] = 1;  // na liscie to by³oby trudne...
+			adjacencyMatrix[v->index][i] = 1;
+			v = v->next;
+		}
+	}
+
+
+	// wyczyszczenie tymczasowej listy s¹siedztwa
+	for (int i = allVertex - 1; i > 0; i = i - 2)
+	{
+		v = adjacencyLists[i];
+		if (v)
+		{
+			free(v);
+		}
+	}
+	for (int i = 0; i < allVertex; i++)
+	{
+		adjacencyLists[i] = NULL;
+	}
+
+
+	matrixToList();
+
+	int distanceSum = countDistances();
+	printf("%i\n", distanceSum);
+
+	//free(throughAncestors);
+	deleteMatrix(adjacencyMatrix);
+	deleteAdjacencyLists(adjacencyLists);
 }
 
 void GFG()
@@ -702,6 +796,18 @@ void deleteAdjacencyLists(adjacencyListVertex** adjcLists)
 {
 	if (adjcLists != NULL)
 	{
+		//adjacencyListVertex* v;
+		//adjacencyListVertex* vDelete;
+		//for (int i = 0; i < allVertex; i++)
+		//{
+		//	v = adjacencyLists[i];
+		//	while (v)
+		//	{
+		//		vDelete = v;
+		//		v = v->next;
+		//		free(vDelete);
+		//	}
+		//}
 		free(adjcLists);
 	}
 }
@@ -755,7 +861,7 @@ void Floyd_Warshall(short** distanceMatrix)
 	//result /= 2; // nasz graf nie jest kierunkowy, wiêc algorytm ka¿d¹ krawêdŸ liczy jak dwie w dwóch kierunkach, dlatego wynik trzeb apodzieliæ na 2
 
 #ifdef DEBUG
-	printf("Result = %lli\n", result);
+	printf("Result = %i\n", result);
 	printMatrix(distanceMatrix);
 #else
 	printf("%i\n", result);
@@ -768,7 +874,7 @@ void Floyd_Warshall(short** distanceMatrix)
 void matrixToList() 
 {
 #ifdef DEBUG
-	//printMatrix(adjacencyMatrix);
+	printMatrix(adjacencyMatrix);
 #endif // DEBUG
 
 	for (int i = allVertex - 1; i >= 0; i--) 
@@ -788,7 +894,7 @@ void matrixToList()
 		}
 	}
 #ifdef DEBUG
-	//printAdjacencyList();
+	printAdjacencyList();
 #endif // DEBUG
 
 }
