@@ -52,6 +52,7 @@ void Lu_Su_Guo();
 void Lu_Su_Guo_v2();
 void Simplical();
 void Wzrostowo_iteracyjny();
+void Wzrostowo_iteracyjny_v2();
 void DCN();
 void GFG();
 void Kronecker();
@@ -64,6 +65,8 @@ void deleteAdjacencyLists(vertex** adjcLists);
 
 void addInfinity(short** distanceMatrix);
 void Floyd_Warshall(short** distanceMatrix);
+
+void coutTempDistancesInMatrix(int lastIndex, int index1, int index2);  // do wzrostowo-iteracyjnego
 
 void matrixToList();
 
