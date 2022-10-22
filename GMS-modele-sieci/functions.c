@@ -19,7 +19,8 @@ void getModel(int model)
 		Simplical();
 		break;
 	case 3:
-		Wzrostowo_iteracyjny();
+		//Wzrostowo_iteracyjny();
+		Wzrostowo_iteracyjny_v2();
 		break;
 	case 4:
 		DCN();
@@ -46,7 +47,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // wêze³ w kroku 0
@@ -637,7 +638,7 @@ void Simplical()
 	
 }
 
-void Wzrostowo_iteracyjny_2()  // drugie podejœcie -> zliczanie odleg³oœci na bie¿¹co
+void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na bie¿¹co
 {
 #ifdef DEBUG
 	printf("Wzrostowo-iteracyjny\n");
@@ -663,10 +664,10 @@ void Wzrostowo_iteracyjny_2()  // drugie podejœcie -> zliczanie odleg³oœci na bi
 	adjacencyMatrix = createMatrix();
 
 	// pos³ugujemy siê krawêdziami
-	edge* e1 = NULL;
-	edge* e2 = NULL;
-	edge* eTemp = NULL;
-	edge* listHead = NULL;
+	edge* e1;
+	edge* e2;
+	edge* eTemp;
+	edge* listHead;
 
 	// krok 0 tworzymy 1 kradzêdŸ z dwoma wierzcho³kami
 	e1 = malloc(sizeof(edge));
@@ -777,10 +778,10 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 	adjacencyMatrix = createMatrix();
 
 	// pos³ugujemy siê krawêdziami
-	edge* e1 = NULL;
-	edge* e2 = NULL;
-	edge* eTemp = NULL;
-	edge* listHead = NULL;
+	edge* e1;
+	edge* e2;
+	edge* eTemp;
+	edge* listHead;
 
 	// krok 0 tworzymy 1 kradzêdŸ z dwoma wierzcho³kami
 	e1 = malloc(sizeof(edge));
