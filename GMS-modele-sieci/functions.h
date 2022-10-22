@@ -24,13 +24,15 @@ typedef struct _vertex
 	struct _vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
 }vertex;
 
-// do Lu-Su-Guo_v2
-typedef struct _adjacencyListVertex		// wierzcholek przechowywany w liscie sasiedztwa
+typedef struct _edge
 {
-	int index;							// indeks wierzcho³ka
-	bool bottom;						// czy jest dolnym wierzcho³kiem?
-	struct _adjacencyListVertex *next;	// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa 
-}adjacencyListVertex;
+	int index;
+	int v1index;
+	int v2index;
+	bool new;
+	struct _edge* next;
+} edge;
+
 
 // do BFS
 typedef struct _BFSvertex 
@@ -40,7 +42,7 @@ typedef struct _BFSvertex
 }BFSvertex;
 
 
-adjacencyListVertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
+vertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 void getModel(int model);
 
@@ -50,18 +52,21 @@ void Lu_Su_Guo();
 void Lu_Su_Guo_v2();
 void Simplical();
 void Wzrostowo_iteracyjny();
+void Wzrostowo_iteracyjny_v2();
 void DCN();
 void GFG();
 void Kronecker();
 
 short** createMatrix();
 void deleteMatrix(short** matrix);
-adjacencyListVertex** createAdjacencyLists(); 
-void deleteAdjacencyLists(adjacencyListVertex** adjcLists);
+vertex** createAdjacencyLists(); 
+void deleteAdjacencyLists(vertex** adjcLists);
 
 
 void addInfinity(short** distanceMatrix);
 void Floyd_Warshall(short** distanceMatrix);
+
+void coutTempDistancesInMatrix(int lastIndex, int index1, int index2);  // do wzrostowo-iteracyjnego
 
 void matrixToList();
 
