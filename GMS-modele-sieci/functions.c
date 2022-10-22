@@ -642,7 +642,107 @@ void Wzrostowo_iteracyjny()
 #ifdef DEBUG
 	printf("Wzrostowo-iteracyjny\n");
 #endif // DEBUG
-	
+
+	int k = 0;
+	int r = 0;
+	scanf_s("%i %i", &k, &r);
+#ifdef DEBUG
+	printf("k = %i  r = %i\n", k, r);
+#endif // DEBUG
+
+	allVertex =1;
+	for (int i = 0; i < k; i++)
+	{
+		allVertex = allVertex * 2 * r;
+	}
+	allVertex = (allVertex * r + 3 * r - 2) / (2 * r - 1);
+#ifdef DEBUG
+	printf("liczba wierzcholkow = %i\n", allVertex);
+#endif // DEBUG
+
+	adjacencyMatrix = createMatrix();
+
+	// pos³ugujemy siê krawêdziami
+	edge* e1 = NULL;
+	edge* e2 = NULL;
+	edge* eTemp = NULL;
+	edge* listHead = NULL;
+
+	// krok 0 tworzymy 1 kradzêdŸ z dwoma wierzcho³kami
+	e1 = malloc(sizeof(edge));
+	if (e1 == NULL)
+		return;
+	e1->index = 0;
+	e1->v1index = 0;
+	e1->v2index = 1;
+	e1->new = true;
+	e1->next = NULL;
+	// uzupe³niamy macierz s¹siedztwa
+	adjacencyMatrix[0][1] = 1;
+	adjacencyMatrix[1][0] = 1;
+	// krawêd¿ na pocz¹tek listy
+	listHead = e1;
+
+	// krok > 0
+	int lastVertexIndex = e1->v2index; // 1
+	int lastEdgeIndex = e1->index;     // 0
+	int prevStep = 0;
+
+	while (prevStep < k)
+	{
+		eTemp = listHead;
+
+		while (eTemp && eTemp->new)  // dopóki mamy wierzcho³ki w liœcie i s¹ one nowe (nowe w poprzednik kroku)
+		{
+			for (int i = 0; i < r; i++) // tyle dochodzi wierzcho³ków da jedn¹ krawêdŸ z poprzedniego kroku
+			{
+				// tworzymy now¹ krawêdŸ po³¹czon¹ z v1index poprzedniej krawêdzi i  z nowym wierzcho³kiem
+				e1 = malloc(sizeof(edge));
+				e1->index = lastEdgeIndex + 1;  // wiem, ¿e mo¿na to zapisaæ ++lastEdge, ale tak jak jest, jest bardziej czytelnie
+				lastEdgeIndex++;
+				e1->v1index = eTemp->v1index;
+				e1->v2index = lastVertexIndex + 1; // nowy wierzcho³ek
+				lastVertexIndex++;
+				e1->new = true;
+				e1->next = NULL;
+				// uzupe³niamy macierz s¹siedztwa
+				adjacencyMatrix[e1->v1index][e1->v2index] = 1;
+				adjacencyMatrix[e1->v2index][e1->v1index] = 1;
+
+				// druga krawêdŸ (e1 i e2 maj¹ wspólny wierzcho³ek v2index) ³¹czymy z nowym wierzcho³kiem i v2index poprzedniej krawêdzi
+				e2 = malloc(sizeof(edge));
+				e2->index = lastEdgeIndex + 1;
+				lastEdgeIndex++;
+				e2->v1index = eTemp->v2index;
+				e2->v2index = lastVertexIndex;
+				e2->new = true;
+				e2->next = NULL;
+				// uzupe³niamy macierz s¹siedztwa
+				adjacencyMatrix[e2->v1index][e2->v2index] = 1;
+				adjacencyMatrix[e2->v2index][e2->v1index] = 1;
+
+				// nowe krawêdzie na pocz¹tek listy
+				e1->next = listHead;
+				e2->next = e1;
+				listHead = e2;
+			}
+
+			// krawêdz, do której do³¹czylismy ju¿ komplet ju¿ nie jest nowa i przechodzimy do kolejnej
+			eTemp->new = false;
+			eTemp = eTemp->next;
+		}
+
+		prevStep++;
+	}
+
+	adjacencyLists = createAdjacencyLists();
+	matrixToList();
+
+	int distanceSum = countDistances();
+	printf("%i\n", distanceSum);
+
+	deleteMatrix(adjacencyMatrix);
+	deleteAdjacencyLists(adjacencyLists);
 }
 
 void DCN()

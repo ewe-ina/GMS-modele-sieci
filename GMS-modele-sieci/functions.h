@@ -24,6 +24,15 @@ typedef struct _vertex
 	struct _vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
 }vertex;
 
+typedef struct _edge
+{
+	int index;
+	int v1index;
+	int v2index;
+	bool new;
+	struct _edge* next;
+} edge;
+
 
 // do BFS
 typedef struct _BFSvertex 
