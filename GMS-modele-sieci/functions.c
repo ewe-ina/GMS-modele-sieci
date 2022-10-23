@@ -36,7 +36,7 @@ void getModel(int model)
 	}
 }
 
-void Barabasi_Ravasz_Vicsek_v2()
+void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzedniego kroku
 {
 #ifdef DEBUG
 	printf("Barabasi-Ravasz-Vicsek\n");
@@ -485,9 +485,9 @@ void Lu_Su_Guo_v2()
 
 		// TODO algorytm BFS dla list s¹siedztwa (dla macierzy na za du¿¹ z³ozonoœæ czasow¹) DONE
 		// zapisywanie wyników do tablicy
-		int resultsMemo[1022];	// zapamiêtanie wyników testów, indeks w tablicy to liczba zadanych wierzcho³ków, najwiêksza liczba wierzcho³ków LSG to 1022
+		int resultsMemo[MAXVERTEXES];	// zapamiêtanie wyników testów, indeks w tablicy to liczba zadanych wierzcho³ków
 								// to do, spr jaka jest faktycznie najwieksza liczba tych wierzcho³ków?				
-		for (int i = 0; i < 1022; i++)
+		for (int i = 0; i < MAXVERTEXES; i++)
 			resultsMemo[i] = -1;  // -1 to brak wyniku
 
 		resultsMemo[0] = 0;
@@ -891,9 +891,9 @@ void DCN()
 	}
 
 	// zliczenie odleg³oœci od ka¿dego po przodkach do v0 - póŸniej siê to przyda
-	//int* throughAncestors = (int*)calloc(allVertex, sizeof(int));
-	int throughAncestors[1022];
-	for (int i = 0; i < 1022; i++)
+	//int* throughAncestors = (int*)calloc(MAXVERTEXES, sizeof(int));
+	int throughAncestors[MAXVERTEXES];
+	for (int i = 0; i < MAXVERTEXES; i++)
 	{
 		throughAncestors[i] = 0;
 	}
@@ -975,6 +975,37 @@ void Kronecker()
 	printf("Kronecker\n");
 #endif // DEBUG
 
+	int n = 0;  //potêga
+	char buffor[100] = { 0 };
+	scanf_s("%i", &n);
+	scanf_s("%s", buffor, (unsigned)_countof(buffor));
+#ifdef DEBUG
+	printf("n = %i  buffor = %s\n", n, buffor);
+#endif // DEBUG
+	if (strlen(buffor) == 0)
+		return;
+	allVertex = (int)sqrt(strlen(buffor));
+#ifdef DEBUG
+	printf("Liczba wierzcholkow: %i\n", allVertex);
+#endif // DEBUG
+
+	adjacencyMatrix = createMatrix();
+
+	int nchar = 0;
+	for (int i = 0; i < allVertex; ++i)
+	{
+		for (int j = 0; j < allVertex; ++j)
+		{
+			adjacencyMatrix[i][j] = buffor[nchar++] - '0';
+		}
+	}
+#ifdef DEBUG
+	printMatrix(adjacencyMatrix);
+#endif // DEBUG
+
+
+
+	deleteMatrix(adjacencyMatrix);
 }
 
 short** createMatrix()

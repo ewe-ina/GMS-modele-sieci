@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "queue.h"
 #include "stack.h"
 
@@ -14,6 +15,7 @@ short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹
 
 
 #define MAXVAL  SHRT_MAX / 3  // imituje nieskonczonosc w algorytmie
+#define MAXVERTEXES 1000
 //#define DEBUG
 
 
