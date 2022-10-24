@@ -40,18 +40,30 @@ int main()
 
 
 	int noOfModel = 0;
-	int retval;
+	int retval = 0;
 
 
-	while (retval = scanf_s("%i", &noOfModel)) //scanf - may be unsafe // EOL == Ctrl+D, Enter  (lub Ctr+Z)
+	//while (retval = scanf_s("%i", &noOfModel)) //scanf - may be unsafe // EOL == Ctrl+D, Enter  (lub Ctr+Z)
+	//{
+	//	if (retval == EOF)
+	//		break;
+	//	getchar(); // spacja
+
+
+	//	getModel(noOfModel);
+	//}
+
+	do
 	{
+		retval = scanf_s("%i", &noOfModel);
+
 		if (retval == EOF)
 			break;
 		getchar(); // spacja
 
-
 		getModel(noOfModel);
-	}
+}
+	while (retval);
 
 #ifdef DEBUG
 	printf("Bye!\n");

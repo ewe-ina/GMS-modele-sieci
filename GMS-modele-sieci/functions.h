@@ -59,7 +59,8 @@ void DCN();
 void GFG();
 void Kronecker();
 
-short** createMatrix();
+short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
+short** createMatrix(int n); // towrzy macierz o zadanym rozmiarze n
 void deleteMatrix(short** matrix);
 vertex** createAdjacencyLists(); 
 void deleteAdjacencyLists(vertex** adjcLists);

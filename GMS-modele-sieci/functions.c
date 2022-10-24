@@ -47,7 +47,7 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // wêze³ w kroku 0
@@ -78,12 +78,9 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 
 
 	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
 
-	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
+	// zbudowaæ graf --> macierz s¹siedztwa
 	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
-	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
-	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
 
 	// krok 0
 	short i = 0;
@@ -96,8 +93,6 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 		for (i = 1; i < 3; i++)
 		{
 			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-			indexMatrix[i][j] = i;
-			indexMatrix[j][i] = j;
 		}
 		copyVertex = 3;
 	}
@@ -129,13 +124,11 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
 #endif // DEBUG
 						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
-						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
 						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
-							indexMatrix[0][copyIndex_j] = 0;
-							indexMatrix[copyIndex_j][0] = copyIndex_j;
+							adjacencyMatrix[0][copyIndex_j] = 1;
+							adjacencyMatrix[copyIndex_j][0] = 1;
 						}
 
 						copyIndex_i += copyVertex;
@@ -145,7 +138,6 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
 #endif // DEBUG
 						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
-						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
 #ifdef DEBUG
 						if (j >= allVertex)
@@ -153,9 +145,8 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 #endif // DEBUG
 						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
-							indexMatrix[0][copyIndex_j] = 0;
-							indexMatrix[copyIndex_j][0] = copyIndex_j;
+							adjacencyMatrix[0][copyIndex_j] = 1;
+							adjacencyMatrix[copyIndex_j][0] = 1;
 						}
 					}
 				}
@@ -183,8 +174,7 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 
 
 	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
-
+	deleteAdjacencyLists(adjacencyLists);
 }
 
 void Barabasi_Ravasz_Vicsek()
@@ -974,38 +964,76 @@ void Kronecker()
 #ifdef DEBUG
 	printf("Kronecker\n");
 #endif // DEBUG
+	// Silny produkt grafowy jest operacj¹ binarn¹ na grafach G1 i G2, która daje w wyniku graf H o nastêpuj¹cych w³asnoœciach:
+	// - zbiór wierzcho³ków w grafie H jest iloczynem kartezjañskim V(G1) x V(G2), gdzie V(G1) i V(G2) s¹ zbiorami wierzcho³ków
+	// - dwa wierzcho³ki (u1,u2) i (v1,v2) z H s¹ po³¹czone krawêdzi¹ <=> gdy wierzcho³ki u1,u2,v1,v2 spe³niaj¹ pewne warunki dot. krawêdzi w G1 i G2
+	// - warunek dot. krawêdzi: u1 = v1 oraz u2v2 nale¿y do E(G2) albo
+	//                          u1v1 nale¿y do E(G1) oraz u2 = v2 albo
+	//                          u1v1 nale¿y do E(G1) oraz u2v2 nale¿y do E(G2)
 
-	int n = 0;  //potêga
+	int k = 0;  //potêga i zarazem liczba kroków
 	char buffor[100] = { 0 };
-	scanf_s("%i", &n);
+	scanf_s("%i", &k);
 	scanf_s("%s", buffor, (unsigned)_countof(buffor));
 #ifdef DEBUG
 	printf("n = %i  buffor = %s\n", n, buffor);
 #endif // DEBUG
 	if (strlen(buffor) == 0)
 		return;
-	allVertex = (int)sqrt(strlen(buffor));
+	int startVertex = (int)sqrt(strlen(buffor));  // wejœciowa liczba wierzcho³ków
 #ifdef DEBUG
-	printf("Liczba wierzcholkow: %i\n", allVertex);
+	printf("Liczba wierzcholkow: %i\n", startVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	short** G1 = createMatrix(startVertex);
+	short** G2 = createMatrix(startVertex);
 
+	// wczytujemy graf podany w postaci macierzy s¹siedztwa
+	// 2 razy, bo bêdziemy tworzyæ silny produkt grafowy
 	int nchar = 0;
-	for (int i = 0; i < allVertex; ++i)
+	for (int i = 0; i < startVertex; ++i)
 	{
-		for (int j = 0; j < allVertex; ++j)
+		for (int j = 0; j < startVertex; ++j)
 		{
-			adjacencyMatrix[i][j] = buffor[nchar++] - '0';
+			G1[i][j] = G2[i][j] = buffor[nchar++] - '0';
 		}
 	}
 #ifdef DEBUG
-	printMatrix(adjacencyMatrix);
+	printMatrix(G1);
 #endif // DEBUG
 
+	short** H = NULL; // graf H - silny produkt
+
+	allVertex = startVertex;  // allVertex - koñcowa liczba wierzcho³ków
+	for (int i = 1; i < k; i++)
+	{
+		allVertex *= startVertex;
+	}
+
+	int tempVertex = startVertex;  // do œledzenia iloœci wierzcho³ków w klejnych krokach (mno¿eniach)
+
+	while (tempVertex < allVertex)
+	{
+		// jeœli mamy kolejny krok (kolejne mno¿enie), to musimy zwolniæ poprzedn¹ wejœciow¹ wersjê grafu
+		// i przypisaæ do niej graf H, by móc dalej mno¿yæ (kartezjañsko ofc)
+		if (H)
+		{
+			deleteMatrix(G1);
+			G1 = H;
+		}
+
+		// tworzenie grafu H - silny produkt
+		tempVertex *= startVertex; // nowa liczba wierzcho³ków
+		H = createMatrix(tempVertex);
+		// krawêdzie na podstawie trzech warunków
+
+	}
 
 
-	deleteMatrix(adjacencyMatrix);
+
+
+	deleteMatrix(G1);
+	deleteMatrix(G2);
 }
 
 short** createMatrix()
@@ -1015,6 +1043,18 @@ short** createMatrix()
 	{
 		for (int i = 0; i < allVertex; ++i)
 			matrix[i] = (short*)calloc(allVertex, sizeof(short));
+	}
+
+	return matrix;
+}
+
+short** createMatrix(int n)
+{
+	short** matrix = (short**)calloc(n, sizeof(short*));   // calloc od razu inicjalizuje 0
+	if (matrix != NULL)
+	{
+		for (int i = 0; i < n; ++i)
+			matrix[i] = (short*)calloc(n, sizeof(short));
 	}
 
 	return matrix;
