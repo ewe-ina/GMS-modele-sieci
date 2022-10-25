@@ -63,8 +63,11 @@ void Kronecker();
 //short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
 short** createMatrix(int n); // towrzy macierz o zadanym rozmiarze n
 void deleteMatrix(short** matrix);
-vertex** createAdjacencyLists(); 
-void deleteAdjacencyLists(vertex** adjcLists);
+int** createMatrixInt(int n);
+void deleteMatrixInt(int** matrix,int n);
+
+vertex** createAdjacencyLists(int n); 
+void deleteAdjacencyLists(vertex** adjcLists, int n);
 
 
 void addInfinity(short** distanceMatrix);
@@ -72,10 +75,12 @@ void Floyd_Warshall(short** distanceMatrix);
 
 void coutTempDistancesInMatrix(int lastIndex, int index1, int index2);  // do wzrostowo-iteracyjnego
 
-void matrixToList();
+void matrixToList(int n);
 
 int countDistances();
-BFSvertex* BFS(int start);
+BFSvertex* BFS(int start, int n);
+
+int** countDistancesReturnMatrix(int n); // zwraca macierz odleg³oœci, do Knockera
 
 // POMOCNICZE
 #ifdef DEBUG
