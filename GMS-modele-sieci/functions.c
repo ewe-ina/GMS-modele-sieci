@@ -47,7 +47,7 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
+	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // węzeł w kroku 0
@@ -173,7 +173,7 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 	printf("%i\n", distanceSum);
 
 
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
@@ -305,8 +305,8 @@ void Barabasi_Ravasz_Vicsek()
 	
 	Floyd_Warshall(adjacencyMatrix);
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteMatrix(indexMatrix, allVertex);
 		
 }
 
@@ -474,29 +474,15 @@ void Lu_Su_Guo_v2()
 		matrixToList(allVertex);
 
 		// TODO algorytm BFS dla list sąsiedztwa (dla macierzy na za dużą złozoność czasową) DONE
-		// zapisywanie wyników do tablicy
-		int resultsMemo[MAXVERTEXES];	// zapamiętanie wyników testów, indeks w tablicy to liczba zadanych wierzchołków
-								// to do, spr jaka jest faktycznie najwieksza liczba tych wierzchołków?				
-		for (int i = 0; i < MAXVERTEXES; i++)
-			resultsMemo[i] = -1;  // -1 to brak wyniku
 
-		resultsMemo[0] = 0;
-		resultsMemo[1] = 0;
-		resultsMemo[2] = 1;
-		resultsMemo[3] = 3;
+		int distanceSum = 0;
+		distanceSum = countDistances();
 
-		// jeśli wyniku w tabali brak (sprawdzenie to O(1), to liczymy 
-		if (resultsMemo[allVertex] == -1)
-		{
-			int distanceSum = 0;
-			distanceSum = countDistances();
-			resultsMemo[allVertex] = distanceSum;
-		}
+		printf("%i\n", distanceSum);
 
-		printf("%i\n", resultsMemo[allVertex]);
 	}
 
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
@@ -613,8 +599,8 @@ void Lu_Su_Guo()
 		Floyd_Warshall(adjacencyMatrix);
 	}
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteMatrix(indexMatrix, allVertex);
 	
 	// test 1 6 -> JEST OK
 	// matrixForTest();
@@ -738,7 +724,7 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejście -> zliczanie odległości n
 	}
 	printf("%i\n", distanceSum);
 
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 }
 
 
@@ -846,7 +832,7 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczać odległośc
 	int distanceSum = countDistances();
 	printf("%i\n", distanceSum);
 
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
@@ -948,7 +934,7 @@ void DCN()
 	printf("%i\n", distanceSum);
 
 	//free(throughAncestors);
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
@@ -1018,7 +1004,7 @@ void Kronecker()
 		// i przypisać do niej graf H, by móc dalej mnożyć (kartezjańsko ofc)
 		if (H)
 		{
-			deleteMatrix(G1);
+			//deleteMatrix(G1, HVertex);  // problem ze zwalnianiem pamięci?
 			G1 = H;
 		}
 
@@ -1085,8 +1071,8 @@ void Kronecker()
 
 	printf("%i\n", distancesSum);
 
-	deleteMatrix(G1);
-	deleteMatrix(G2);
+	deleteMatrix(H, HVertex);
+	deleteMatrix(G2, startVertex);
 	deleteMatrixInt(distancesMatrix, startVertex);
 	deleteAdjacencyLists(adjacencyLists, startVertex);
 }
@@ -1115,11 +1101,11 @@ short** createMatrix(int n)
 	return matrix;
 }
 
-void deleteMatrix(short** matrix)
+void deleteMatrix(short** matrix, int n)
 {
 	if (matrix != NULL)
 	{
-		for (int i = 0; i < allVertex; ++i)
+		for (int i = 0; i < n; ++i)
 			free(matrix[i]);
 		free(matrix);
 	}

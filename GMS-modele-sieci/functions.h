@@ -62,7 +62,7 @@ void Kronecker();
 // C does not support overloading
 //short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
 short** createMatrix(int n); // towrzy macierz o zadanym rozmiarze n
-void deleteMatrix(short** matrix);
+void deleteMatrix(short** matrix, int n);
 int** createMatrixInt(int n);
 void deleteMatrixInt(int** matrix,int n);
 
