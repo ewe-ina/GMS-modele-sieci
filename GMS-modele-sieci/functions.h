@@ -59,7 +59,8 @@ void DCN();
 void GFG();
 void Kronecker();
 
-short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
+// C does not support overloading
+//short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
 short** createMatrix(int n); // towrzy macierz o zadanym rozmiarze n
 void deleteMatrix(short** matrix);
 vertex** createAdjacencyLists(); 

@@ -77,7 +77,7 @@ void Barabasi_Ravasz_Vicsek_v2() // mo¿na jeszcze zapamiêtywaæ macierz z poprzed
 #endif // DEBUG
 
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
 	// zbudowaæ graf --> macierz s¹siedztwa
 	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
@@ -217,8 +217,8 @@ void Barabasi_Ravasz_Vicsek()
 #endif // DEBUG
 
 
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
+	indexMatrix = createMatrix(allVertex);
 
 	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
 	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
@@ -331,7 +331,7 @@ void Lu_Su_Guo_v2()
 	//vertex** adjacencyList;	//tablica wskaŸników
 	//vertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
 
-	adjacencyMatrix = createMatrix();	// pusta macierz s¹siedztwa
+	adjacencyMatrix = createMatrix(allVertex);	// pusta macierz s¹siedztwa
 
 	// tu mozna dac tablice wynikow a w ifie ja wypelniac, na koncu drukowac
 
@@ -511,8 +511,8 @@ void Lu_Su_Guo()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
+	indexMatrix = createMatrix(allVertex);
 
 	// krok 0
 	if (allVertex < 2)
@@ -651,7 +651,7 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
 	// pos³ugujemy siê krawêdziami
 	edge* e1;
@@ -765,7 +765,7 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
 	// pos³ugujemy siê krawêdziami
 	edge* e1;
@@ -861,7 +861,7 @@ void DCN()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 	adjacencyLists = createAdjacencyLists();
 	vertex* v;
 
@@ -1010,9 +1010,9 @@ void Kronecker()
 		allVertex *= startVertex;
 	}
 
-	int tempVertex = startVertex;  // do œledzenia iloœci wierzcho³ków w klejnych krokach (mno¿eniach)
+	int HVertex = startVertex;	// do œledzenia iloœci wierzcho³ków w klejnych krokach (mno¿eniach), czyli iloœæ wierzcho³ków grafu H - silnego produktu
 
-	while (tempVertex < allVertex)
+	while (HVertex < allVertex)
 	{
 		// jeœli mamy kolejny krok (kolejne mno¿enie), to musimy zwolniæ poprzedn¹ wejœciow¹ wersjê grafu
 		// i przypisaæ do niej graf H, by móc dalej mno¿yæ (kartezjañsko ofc)
@@ -1023,10 +1023,29 @@ void Kronecker()
 		}
 
 		// tworzenie grafu H - silny produkt
-		tempVertex *= startVertex; // nowa liczba wierzcho³ków
-		H = createMatrix(tempVertex);
+		HVertex *= startVertex; // nowa liczba wierzcho³ków
+		H = createMatrix(HVertex);
 		// krawêdzie na podstawie trzech warunków
+		for (int i = 0; i < HVertex; i++)
+		{
+			for (int j = 0; j < HVertex; j++)
+			{
+				    // u1 = v1 oraz u2v2 nale¿y do E(G2) albo
+				if (((i / startVertex == j / startVertex) && (G2[i % startVertex][j % startVertex])) ||
+					// u1v1 nale¿y do E(G1) oraz u2 = v2 albo
+					((G1[i / startVertex][j / startVertex]) && (i % startVertex == j % startVertex)) ||
+					// u1v1 nale¿y do E(G1) oraz u2v2 nale¿y do E(G2)
+					((G1[i / startVertex][j / startVertex] == 1) && (G2[i % startVertex][j % startVertex] == 1)))
+				{
+					H[i][j] = 1;
+				}
+			}
+		}
 
+		if (H == NULL)
+		{
+			H = G1;
+		}
 	}
 
 
@@ -1036,17 +1055,17 @@ void Kronecker()
 	deleteMatrix(G2);
 }
 
-short** createMatrix()
-{
-	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
-	if (matrix != NULL)
-	{
-		for (int i = 0; i < allVertex; ++i)
-			matrix[i] = (short*)calloc(allVertex, sizeof(short));
-	}
-
-	return matrix;
-}
+//short** createMatrix()
+//{
+//	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
+//	if (matrix != NULL)
+//	{
+//		for (int i = 0; i < allVertex; ++i)
+//			matrix[i] = (short*)calloc(allVertex, sizeof(short));
+//	}
+//
+//	return matrix;
+//}
 
 short** createMatrix(int n)
 {
