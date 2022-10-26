@@ -81,6 +81,7 @@ int countDistances();
 BFSvertex* BFS(int start, int n);
 
 int** countDistancesReturnMatrix(int n); // zwraca macierz odleg³oœci, do Knockera
+int distanceOfStrongProductDigraphs(int** matrix, int n, int i, int j, int k);
 
 // POMOCNICZE
 #ifdef DEBUG

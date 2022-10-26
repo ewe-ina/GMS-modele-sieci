@@ -1067,6 +1067,13 @@ void Kronecker()
 	}
 	else if (k > 1) // tu dla silnego produktu  TODO!
 	{
+		for (int i = 0; i < HVertex; i++)
+		{
+			for (int j = i; j < HVertex; j++)
+			{
+				distancesSum += distanceOfStrongProductDigraphs(distancesMatrix, startVertex, i, j, k);
+			}
+		}
 	}
 
 	printf("%i\n", distancesSum);
@@ -1075,6 +1082,51 @@ void Kronecker()
 	deleteMatrix(G2, startVertex);
 	deleteMatrixInt(distancesMatrix, startVertex);
 	deleteAdjacencyLists(adjacencyLists, startVertex);
+}
+
+// 𝑑𝐺1⊠𝐺2(𝑥, 𝑦) = 𝑚𝑎𝑥{ 𝑑𝐺1(𝑥1, 𝑦1), 𝑑𝐺2(𝑥2, 𝑦2) }
+// 𝑑𝐺1⊠𝐺2(1, 2) = 𝑚𝑎𝑥{ 𝑑𝐺1(u1, u2), 𝑑𝐺2(v1, v2) }
+// rekurencja!
+// czego potrzebujemy na wejściu:
+// - dostęp do macierzy odległości
+// - liczba kroków
+// - wierzchołek i (u1,u2), wierzchołek j (v1,v2)
+//u1 = i / startVertex;
+//v1 = j / startVertex;
+//u2 = i % startVertex;
+//v2 = j % startVertex;
+int distanceOfStrongProductDigraphs(int** matrix, int n, int i, int j, int k)
+{
+	int u1 = i / n; //a1
+	int v1 = j / n; //a2
+	int u2 = i % n; //b1
+	int v2 = j % n; //b2
+
+	// warunek wyjścia - gdy mamy 2 zwykłe grafy, a jeszcze żadnego silnego produktu
+	if (k == 2)
+	{
+		if ((matrix[u1][v1]) > (matrix[u2][v2]))
+		{
+			return matrix[u1][v1];
+		}
+		else
+		{
+			return matrix[u2][v2];
+		}
+	}
+	else
+	{
+		int dist1 = distanceOfStrongProductDigraphs(matrix, n, u1, v1, k - 1);
+		int dist2 = distanceOfStrongProductDigraphs(matrix, n, u2, v2, k - 1);
+		if (dist1 > dist2)
+		{
+			return dist1;
+		}
+		else
+		{
+			return dist2;
+		}
+	}
 }
 
 //short** createMatrix()
