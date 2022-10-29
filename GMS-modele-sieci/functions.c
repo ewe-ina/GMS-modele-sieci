@@ -1065,7 +1065,7 @@ void Kronecker()
 			}
 		}
 	}
-	else if (k > 1) // tu dla silnego produktu  TODO!
+	else if (k > 1) // tu dla silnego produktu
 	{
 		for (int i = 0; i < HVertex; i++)
 		{
@@ -1085,7 +1085,7 @@ void Kronecker()
 }
 
 // 𝑑𝐺1⊠𝐺2(𝑥, 𝑦) = 𝑚𝑎𝑥{ 𝑑𝐺1(𝑥1, 𝑦1), 𝑑𝐺2(𝑥2, 𝑦2) }
-// 𝑑𝐺1⊠𝐺2(1, 2) = 𝑚𝑎𝑥{ 𝑑𝐺1(u1, u2), 𝑑𝐺2(v1, v2) }
+// 𝑑𝐺1⊠𝐺2(g1, g2) = 𝑚𝑎𝑥{ 𝑑𝐺1(u1, u2), 𝑑𝐺2(v1, v2) }
 // rekurencja!
 // czego potrzebujemy na wejściu:
 // - dostęp do macierzy odległości
