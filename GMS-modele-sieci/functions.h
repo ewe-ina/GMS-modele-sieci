@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "queue.h"
 #include "stack.h"
 
@@ -14,6 +15,7 @@ short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹
 
 
 #define MAXVAL  SHRT_MAX / 3  // imituje nieskonczonosc w algorytmie
+#define MAXVERTEXES 1000
 //#define DEBUG
 
 
@@ -57,10 +59,15 @@ void DCN();
 void GFG();
 void Kronecker();
 
-short** createMatrix();
-void deleteMatrix(short** matrix);
-vertex** createAdjacencyLists(); 
-void deleteAdjacencyLists(vertex** adjcLists);
+// C does not support overloading
+//short** createMatrix();  // tworzy macierz o rozmiarze allVertex - zmienna globalna
+short** createMatrix(int n); // towrzy macierz o zadanym rozmiarze n
+void deleteMatrix(short** matrix, int n);
+int** createMatrixInt(int n);
+void deleteMatrixInt(int** matrix,int n);
+
+vertex** createAdjacencyLists(int n); 
+void deleteAdjacencyLists(vertex** adjcLists, int n);
 
 
 void addInfinity(short** distanceMatrix);
@@ -68,10 +75,13 @@ void Floyd_Warshall(short** distanceMatrix);
 
 void coutTempDistancesInMatrix(int lastIndex, int index1, int index2);  // do wzrostowo-iteracyjnego
 
-void matrixToList();
+void matrixToList(int n);
 
 int countDistances();
-BFSvertex* BFS(int start);
+BFSvertex* BFS(int start, int n);
+
+int** countDistancesReturnMatrix(int n); // zwraca macierz odleg³oœci, do Knockera
+int distanceOfStrongProductDigraphs(int** matrix, int n, int i, int j, int k);
 
 // POMOCNICZE
 #ifdef DEBUG

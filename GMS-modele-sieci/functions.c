@@ -1,4 +1,4 @@
-//#include <stdio.h>
+ï»¿//#include <stdio.h>
 //#include <stdlib.h>
 //#include <string.h>
 #include "functions.h"
@@ -36,7 +36,7 @@ void getModel(int model)
 	}
 }
 
-void Barabasi_Ravasz_Vicsek_v2()
+void Barabasi_Ravasz_Vicsek_v2() // moÅ¼na jeszcze zapamiÄ™tywaÄ‡ macierz z poprzedniego kroku
 {
 #ifdef DEBUG
 	printf("Barabasi-Ravasz-Vicsek\n");
@@ -47,12 +47,12 @@ void Barabasi_Ravasz_Vicsek_v2()
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wype³nianiu (a nie wychodzimy indeksami poza zakres!)
+	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypeÅ‚nianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
-	allVertex = 1; // wêze³ w kroku 0
+	allVertex = 1; // wÄ™zeÅ‚ w kroku 0
 
-	// LICZBA WIERZCHO£KÓW 
+	// LICZBA WIERZCHOÅKÃ“W 
 	if (k > 0)
 	{
 		for (int i = 0; i < k; i++)
@@ -62,7 +62,7 @@ void Barabasi_Ravasz_Vicsek_v2()
 	printf("Liczba wierzcholkow: %i\n", allVertex);
 
 	int m = 0;
-	// LICZBA KRAWEÊDZI                 
+	// LICZBA KRAWEÄ˜DZI                 
 	if (k > 0)
 	{
 		int j = 1;
@@ -77,13 +77,10 @@ void Barabasi_Ravasz_Vicsek_v2()
 #endif // DEBUG
 
 
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
-	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
-	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
-	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
-	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
+	// zbudowaÄ‡ graf --> macierz sÄ…siedztwa
+	// jeÅ›li jest krawedz: macierzSasiedztwa[i][j] = 1
 
 	// krok 0
 	short i = 0;
@@ -96,8 +93,6 @@ void Barabasi_Ravasz_Vicsek_v2()
 		for (i = 1; i < 3; i++)
 		{
 			adjacencyMatrix[i][j] = adjacencyMatrix[j][i] = 1;
-			indexMatrix[i][j] = i;
-			indexMatrix[j][i] = j;
 		}
 		copyVertex = 3;
 	}
@@ -129,13 +124,11 @@ void Barabasi_Ravasz_Vicsek_v2()
 							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
 #endif // DEBUG
 						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
-						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
 						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
-							indexMatrix[0][copyIndex_j] = 0;
-							indexMatrix[copyIndex_j][0] = copyIndex_j;
+							adjacencyMatrix[0][copyIndex_j] = 1;
+							adjacencyMatrix[copyIndex_j][0] = 1;
 						}
 
 						copyIndex_i += copyVertex;
@@ -145,7 +138,6 @@ void Barabasi_Ravasz_Vicsek_v2()
 							printf("copyIndex_i = %i, copyIndex_j = %i\n", copyIndex_i, copyIndex_j);
 #endif // DEBUG
 						adjacencyMatrix[copyIndex_i][copyIndex_j] = 1;
-						indexMatrix[copyIndex_i][copyIndex_j] = 1;
 
 #ifdef DEBUG
 						if (j >= allVertex)
@@ -153,28 +145,27 @@ void Barabasi_Ravasz_Vicsek_v2()
 #endif // DEBUG
 						if (j > prevCopyIndex && adjacencyMatrix[0][j] == 1)
 						{
-							adjacencyMatrix[0][copyIndex_j] = adjacencyMatrix[copyIndex_j][0] = 1;
-							indexMatrix[0][copyIndex_j] = 0;
-							indexMatrix[copyIndex_j][0] = copyIndex_j;
+							adjacencyMatrix[0][copyIndex_j] = 1;
+							adjacencyMatrix[copyIndex_j][0] = 1;
 						}
 					}
 				}
 			}
 
 			// dolne z korzeniem - DONE WYZEJ
-			// czyli te, które do³o¿one w poprzednim kroku by³y po³¹czone z korzeniem, z przesuniêciem o copyVertex i 2*copyVertex
+			// czyli te, ktÃ³re doÅ‚oÅ¼one w poprzednim kroku byÅ‚y poÅ‚Ä…czone z korzeniem, z przesuniÄ™ciem o copyVertex i 2*copyVertex
 			// czyli zaczynami nie od 0, a od prevCopyIndex;
 
 
-			// na koñcu pêtli
+			// na koÅ„cu pÄ™tli
 			prevCopyIndex = copyVertex;
 			copyVertex *= 3;
 		}
 	}
 
-	// przepisanie macierzy do list s¹siedztwa
-	adjacencyLists = createAdjacencyLists();
-	matrixToList();
+	// przepisanie macierzy do list sÄ…siedztwa
+	adjacencyLists = createAdjacencyLists(allVertex);
+	matrixToList(allVertex);
 
 	int distanceSum = 0;
 	distanceSum = countDistances();
@@ -182,9 +173,8 @@ void Barabasi_Ravasz_Vicsek_v2()
 	printf("%i\n", distanceSum);
 
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
-
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
 void Barabasi_Ravasz_Vicsek()
@@ -200,9 +190,9 @@ void Barabasi_Ravasz_Vicsek()
 #endif // DEBUG
 	if (k > 6) return;  // BEZPIECZNIK
 
-	allVertex = 1; // wêze³ w kroku 0
+	allVertex = 1; // wÄ™zeÅ‚ w kroku 0
 
-	// LICZBA WIERZCHO£KÓW 
+	// LICZBA WIERZCHOÅKÃ“W 
 	if (k > 0)
 	{
 		for (int i = 0; i < k; i++)
@@ -212,7 +202,7 @@ void Barabasi_Ravasz_Vicsek()
 	printf("Liczba wierzcholkow: %i\n", allVertex);
 
 	int m = 0;
-	// LICZBA KRAWÊDZI                 
+	// LICZBA KRAWÄ˜DZI                 
 	if (k > 0)
 	{
 		int j = 1;
@@ -227,13 +217,13 @@ void Barabasi_Ravasz_Vicsek()
 #endif // DEBUG
 
 
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
+	indexMatrix = createMatrix(allVertex);
 
-	// zbudowaæ graf --> macierz s¹siedztwa i macierz identyfikatorów
-	// jeœli jest krawedz: macierzSasiedztwa[i][j] = 1
+	// zbudowaÄ‡ graf --> macierz sÄ…siedztwa i macierz identyfikatorÃ³w
+	// jeÅ›li jest krawedz: macierzSasiedztwa[i][j] = 1
 	// indexMatrix[i][j] = i <=> macierzSasiedztwa[i][j] = 1
-	// jeœli nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoñczonoœæ, a indexMatrix[i][j] jest niezainicjalizowana
+	// jeÅ›li nie ma krawedzi to macierzSasiedztwa[i][j] = nieskoÅ„czonoÅ›Ä‡, a indexMatrix[i][j] jest niezainicjalizowana
 
 	// krok 0
 	short i = 0;
@@ -295,16 +285,16 @@ void Barabasi_Ravasz_Vicsek()
 			}
 
 			// dolne z korzeniem - DONE WYZEJ
-			// czyli te, które do³o¿one w poprzednim kroku by³y po³¹czone z korzeniem, z przesuniêciem o copyVertex i 2*copyVertex
+			// czyli te, ktÃ³re doÅ‚oÅ¼one w poprzednim kroku byÅ‚y poÅ‚Ä…czone z korzeniem, z przesuniÄ™ciem o copyVertex i 2*copyVertex
 			// czyli zaczynami nie od 0, a od prevCopyIndex;
 
 
-			// na koñcu pêtli
+			// na koÅ„cu pÄ™tli
 			prevCopyIndex = copyVertex;
 			copyVertex *= 3;
 		}
 
-		// przejœæ po ca³ej distanceMartix, jeœli nie ma krawêdzi oraz i != j to nieskoñczonoœæ
+		// przejÅ›Ä‡ po caÅ‚ej distanceMartix, jeÅ›li nie ma krawÄ™dzi oraz i != j to nieskoÅ„czonoÅ›Ä‡
 		addInfinity(adjacencyMatrix);
 	}
 	
@@ -315,8 +305,8 @@ void Barabasi_Ravasz_Vicsek()
 	
 	Floyd_Warshall(adjacencyMatrix);
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteMatrix(indexMatrix, allVertex);
 		
 }
 
@@ -331,17 +321,17 @@ void Lu_Su_Guo_v2()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	//wskaŸniki pomocnicze
+	//wskaÅºniki pomocnicze
 	vertex* v1;
 	vertex* v2;
 	vertex* v3;
 	vertex* vTemp;
-	vertex* listHead;	// wskaŸnik na listê nowych wêz³ów
+	vertex* listHead;	// wskaÅºnik na listÄ™ nowych wÄ™zÅ‚Ã³w
 
-	//vertex** adjacencyList;	//tablica wskaŸników
-	//vertex* aLVertex;			// wskaŸnik nawierzcho³ek w liœcie s¹siedztwa
+	//vertex** adjacencyList;	//tablica wskaÅºnikÃ³w
+	//vertex* aLVertex;			// wskaÅºnik nawierzchoÅ‚ek w liÅ›cie sÄ…siedztwa
 
-	adjacencyMatrix = createMatrix();	// pusta macierz s¹siedztwa
+	adjacencyMatrix = createMatrix(allVertex);	// pusta macierz sÄ…siedztwa
 
 	// tu mozna dac tablice wynikow a w ifie ja wypelniac, na koncu drukowac
 
@@ -357,14 +347,14 @@ void Lu_Su_Guo_v2()
 	else
 	{
 		// krok 0
-		// nowy wierzcho³ek - korzeñ
-		v1 = malloc(sizeof(vertex)); // wskaŸnik
+		// nowy wierzchoÅ‚ek - korzeÅ„
+		v1 = malloc(sizeof(vertex)); // wskaÅºnik
 		if (v1 == NULL)
 			return;
 		v1->index = 0;
-		v1->new = false; // bo to korzeñ
+		v1->new = false; // bo to korzeÅ„
 
-		listHead = v1; // g³owa listy
+		listHead = v1; // gÅ‚owa listy
 
 		// krok 1
 
@@ -384,11 +374,11 @@ void Lu_Su_Guo_v2()
 		v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
 		listHead = v3;
 
-		// aktualna lista nowych wêz³ów
+		// aktualna lista nowych wÄ™zÅ‚Ã³w
 		// head->1->2
 
 
-		// wypelnienie macierzy s¹siedztwa dla kroku 1
+		// wypelnienie macierzy sÄ…siedztwa dla kroku 1
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 3; j++)
@@ -412,11 +402,11 @@ void Lu_Su_Guo_v2()
 		{
 			vTemp = listHead;
 
-			stack* s = createStack();  // na stosie bêd¹ nowe wierzcho³ki
+			stack* s = createStack();  // na stosie bÄ™dÄ… nowe wierzchoÅ‚ki
 
 			while (vTemp && vTemp->new == true && vertexCounter < allVertex)
 			{
-				// tworzymy nowy wierzcho³ek i wrzucamy go na stos
+				// tworzymy nowy wierzchoÅ‚ek i wrzucamy go na stos
 				v1 = malloc(sizeof(vertex));
 				if (v1 == NULL)
 					return;
@@ -426,18 +416,18 @@ void Lu_Su_Guo_v2()
 				vertexCounter++;
 				push(s, v1); // wrzucamy na stos
 
-				// po³¹czenie z rodzicem (jeden wy¿ej)
+				// poÅ‚Ä…czenie z rodzicem (jeden wyÅ¼ej)
 				adjacencyMatrix[vTemp->index][v1->index] = 1;
 				adjacencyMatrix[v1->index][vTemp->index] = 1;
 
-				// po³¹czenie z przodkiem
+				// poÅ‚Ä…czenie z przodkiem
 				ancesorIndex = ((v1->index - 1) / 2) % (k - 1);
 				adjacencyMatrix[v1->index][ancesorIndex] = 1;
 				adjacencyMatrix[ancesorIndex][v1->index] = 1;
 
-				if (vertexCounter < allVertex) // spr czy dodajemy drugi wierzcho³ek
+				if (vertexCounter < allVertex) // spr czy dodajemy drugi wierzchoÅ‚ek
 				{
-					// tworzymy nowy wierzcho³ek i wrzucamy go na stos
+					// tworzymy nowy wierzchoÅ‚ek i wrzucamy go na stos
 					v2 = malloc(sizeof(vertex));
 					if (v2 == NULL)
 						return;
@@ -447,16 +437,16 @@ void Lu_Su_Guo_v2()
 					vertexCounter++;
 					push(s, v2);
 
-					// po³¹czenie z rodzicem (jeden wy¿ej)
+					// poÅ‚Ä…czenie z rodzicem (jeden wyÅ¼ej)
 					adjacencyMatrix[vTemp->index][v2->index] = 1;
 					adjacencyMatrix[v2->index][vTemp->index] = 1;
 
-					// po³¹czenie z przodkiem
+					// poÅ‚Ä…czenie z przodkiem
 					ancesorIndex = ((v2->index - 1) / 2) % (k - 1);
 					adjacencyMatrix[v2->index][ancesorIndex] = 1;
 					adjacencyMatrix[ancesorIndex][v2->index] = 1;
 
-					// po³¹czenie 2 nowych ze sob¹ nawzajem
+					// poÅ‚Ä…czenie 2 nowych ze sobÄ… nawzajem
 					adjacencyMatrix[v1->index][v2->index] = 1;
 					adjacencyMatrix[v2->index][v1->index] = 1;
 
@@ -467,7 +457,7 @@ void Lu_Su_Guo_v2()
 			}
 			k++;
 
-			while (!empty(s))  // dopóki stos nie jest pusty
+			while (!empty(s))  // dopÃ³ki stos nie jest pusty
 			{
 				v1 = top(s);
 				pop(s);
@@ -478,36 +468,22 @@ void Lu_Su_Guo_v2()
 		}
 
 
-		// macierz jest gotowa, czyli nie potrzebujê tych list powy¿ej (chyba, ¿e bêdzie coœ nie tak, to trzeba siê przyjrzeæ
-		// przepisanie macierzy do list s¹siedztwa
-		adjacencyLists = createAdjacencyLists();
-		matrixToList();
+		// macierz jest gotowa, czyli nie potrzebujÄ™ tych list powyÅ¼ej (chyba, Å¼e bÄ™dzie coÅ› nie tak, to trzeba siÄ™ przyjrzeÄ‡
+		// przepisanie macierzy do list sÄ…siedztwa
+		adjacencyLists = createAdjacencyLists(allVertex);
+		matrixToList(allVertex);
 
-		// TODO algorytm BFS dla list s¹siedztwa (dla macierzy na za du¿¹ z³ozonoœæ czasow¹) DONE
-		// zapisywanie wyników do tablicy
-		int resultsMemo[1022];	// zapamiêtanie wyników testów, indeks w tablicy to liczba zadanych wierzcho³ków, najwiêksza liczba wierzcho³ków LSG to 1022
-								// to do, spr jaka jest faktycznie najwieksza liczba tych wierzcho³ków?				
-		for (int i = 0; i < 1022; i++)
-			resultsMemo[i] = -1;  // -1 to brak wyniku
+		// TODO algorytm BFS dla list sÄ…siedztwa (dla macierzy na za duÅ¼Ä… zÅ‚ozonoÅ›Ä‡ czasowÄ…) DONE
 
-		resultsMemo[0] = 0;
-		resultsMemo[1] = 0;
-		resultsMemo[2] = 1;
-		resultsMemo[3] = 3;
+		int distanceSum = 0;
+		distanceSum = countDistances();
 
-		// jeœli wyniku w tabali brak (sprawdzenie to O(1), to liczymy 
-		if (resultsMemo[allVertex] == -1)
-		{
-			int distanceSum = 0;
-			distanceSum = countDistances();
-			resultsMemo[allVertex] = distanceSum;
-		}
+		printf("%i\n", distanceSum);
 
-		printf("%i\n", resultsMemo[allVertex]);
 	}
 
-	deleteMatrix(adjacencyMatrix);
-	deleteAdjacencyLists(adjacencyLists);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
 void Lu_Su_Guo()
@@ -521,8 +497,8 @@ void Lu_Su_Guo()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
+	indexMatrix = createMatrix(allVertex);
 
 	// krok 0
 	if (allVertex < 2)
@@ -592,7 +568,7 @@ void Lu_Su_Guo()
 					indexMatrix[i][ancesorIndex] = i;
 					indexMatrix[ancesorIndex][i] = ancesorIndex;
 
-					// po³¹czenie miêdzy dodan¹ par¹
+					// poÅ‚Ä…czenie miÄ™dzy dodanÄ… parÄ…
 					adjacencyMatrix[i][i - 1] = adjacencyMatrix[i - 1][i] = 1;
 					indexMatrix[i][i - 1] = i;
 					indexMatrix[i - 1][i] = i - 1;
@@ -623,8 +599,8 @@ void Lu_Su_Guo()
 		Floyd_Warshall(adjacencyMatrix);
 	}
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteMatrix(indexMatrix, allVertex);
 	
 	// test 1 6 -> JEST OK
 	// matrixForTest();
@@ -638,7 +614,7 @@ void Simplical()
 	
 }
 
-void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na bie¿¹co
+void Wzrostowo_iteracyjny_v2()  // drugie podejÅ›cie -> zliczanie odlegÅ‚oÅ›ci na bieÅ¼Ä…co
 {
 #ifdef DEBUG
 	printf("Wzrostowo-iteracyjny\n");
@@ -661,15 +637,15 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
-	// pos³ugujemy siê krawêdziami
+	// posÅ‚ugujemy siÄ™ krawÄ™dziami
 	edge* e1;
 	edge* e2;
 	edge* eTemp;
 	edge* listHead;
 
-	// krok 0 tworzymy 1 kradzêdŸ z dwoma wierzcho³kami
+	// krok 0 tworzymy 1 kradzÄ™dÅº z dwoma wierzchoÅ‚kami
 	e1 = malloc(sizeof(edge));
 	if (e1 == NULL)
 		return;
@@ -678,10 +654,10 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 	e1->v2index = 1;
 	e1->new = true;
 	e1->next = NULL;
-	// uzupe³niamy macierz s¹siedztwa
+	// uzupeÅ‚niamy macierz sÄ…siedztwa
 	adjacencyMatrix[0][1] = 1;
 	adjacencyMatrix[1][0] = 1;
-	// krawêd¿ na pocz¹tek listy
+	// krawÄ™dÅ¼ na poczÄ…tek listy
 	listHead = e1;
 
 	// krok > 0
@@ -693,26 +669,26 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 	{
 		eTemp = listHead;
 
-		while (eTemp && eTemp->new)  // dopóki mamy wierzcho³ki w liœcie i s¹ one nowe (nowe w poprzednik kroku)
+		while (eTemp && eTemp->new)  // dopÃ³ki mamy wierzchoÅ‚ki w liÅ›cie i sÄ… one nowe (nowe w poprzednik kroku)
 		{
-			for (int i = 0; i < r; i++) // tyle dochodzi wierzcho³ków da jedn¹ krawêdŸ z poprzedniego kroku
+			for (int i = 0; i < r; i++) // tyle dochodzi wierzchoÅ‚kÃ³w da jednÄ… krawÄ™dÅº z poprzedniego kroku
 			{
-				// tworzymy now¹ krawêdŸ po³¹czon¹ z v1index poprzedniej krawêdzi i  z nowym wierzcho³kiem
+				// tworzymy nowÄ… krawÄ™dÅº poÅ‚Ä…czonÄ… z v1index poprzedniej krawÄ™dzi i  z nowym wierzchoÅ‚kiem
 				e1 = malloc(sizeof(edge));
-				e1->index = lastEdgeIndex + 1;  // wiem, ¿e mo¿na to zapisaæ ++lastEdge, ale tak jak jest, jest bardziej czytelnie
+				e1->index = lastEdgeIndex + 1;  // wiem, Å¼e moÅ¼na to zapisaÄ‡ ++lastEdge, ale tak jak jest, jest bardziej czytelnie
 				lastEdgeIndex++;
 				e1->v1index = eTemp->v1index;
-				e1->v2index = lastVertexIndex + 1; // nowy wierzcho³ek
+				e1->v2index = lastVertexIndex + 1; // nowy wierzchoÅ‚ek
 				lastVertexIndex++;
 				e1->new = true;
 				e1->next = NULL;
-				// uzupe³niamy macierz s¹siedztwa
+				// uzupeÅ‚niamy macierz sÄ…siedztwa
 				adjacencyMatrix[e1->v1index][e1->v2index] = 1;
 				adjacencyMatrix[e1->v2index][e1->v1index] = 1;
-				// zliczamy na bie¿¹co bezpoœrednio w macierzy s¹siedztwa - na koñcu bêdziemy mieæ macierz odleg³oœci!
+				// zliczamy na bieÅ¼Ä…co bezpoÅ›rednio w macierzy sÄ…siedztwa - na koÅ„cu bÄ™dziemy mieÄ‡ macierz odlegÅ‚oÅ›ci!
 				coutTempDistancesInMatrix(lastVertexIndex, e1->v1index, e1->v2index);
 
-				// druga krawêdŸ (e1 i e2 maj¹ wspólny wierzcho³ek v2index) ³¹czymy z nowym wierzcho³kiem i v2index poprzedniej krawêdzi
+				// druga krawÄ™dÅº (e1 i e2 majÄ… wspÃ³lny wierzchoÅ‚ek v2index) Å‚Ä…czymy z nowym wierzchoÅ‚kiem i v2index poprzedniej krawÄ™dzi
 				e2 = malloc(sizeof(edge));
 				e2->index = lastEdgeIndex + 1;
 				lastEdgeIndex++;
@@ -720,19 +696,19 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 				e2->v2index = lastVertexIndex;
 				e2->new = true;
 				e2->next = NULL;
-				// uzupe³niamy macierz s¹siedztwa
+				// uzupeÅ‚niamy macierz sÄ…siedztwa
 				adjacencyMatrix[e2->v1index][e2->v2index] = 1;
 				adjacencyMatrix[e2->v2index][e2->v1index] = 1;
-				// zliczamy na bie¿¹co bezpoœrednio w macierzy s¹siedztwa - na koñcu bêdziemy mieæ macierz odleg³oœci!
+				// zliczamy na bieÅ¼Ä…co bezpoÅ›rednio w macierzy sÄ…siedztwa - na koÅ„cu bÄ™dziemy mieÄ‡ macierz odlegÅ‚oÅ›ci!
 				coutTempDistancesInMatrix(lastVertexIndex, e2->v1index, e2->v2index);
 
-				// nowe krawêdzie na pocz¹tek listy
+				// nowe krawÄ™dzie na poczÄ…tek listy
 				e1->next = listHead;
 				e2->next = e1;
 				listHead = e2;
 			}
 
-			// krawêdz, do której do³¹czylismy ju¿ komplet ju¿ nie jest nowa i przechodzimy do kolejnej
+			// krawÄ™dz, do ktÃ³rej doÅ‚Ä…czylismy juÅ¼ komplet juÅ¼ nie jest nowa i przechodzimy do kolejnej
 			eTemp->new = false;
 			eTemp = eTemp->next;
 		}
@@ -748,11 +724,11 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejœcie -> zliczanie odleg³oœci na b
 	}
 	printf("%i\n", distanceSum);
 
-	deleteMatrix(adjacencyMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
 }
 
 
-void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci na bie¿¹co?
+void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaÄ‡ odlegÅ‚oÅ›ci na bieÅ¼Ä…co?
 {
 #ifdef DEBUG
 	printf("Wzrostowo-iteracyjny\n");
@@ -775,15 +751,15 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
 
-	// pos³ugujemy siê krawêdziami
+	// posÅ‚ugujemy siÄ™ krawÄ™dziami
 	edge* e1;
 	edge* e2;
 	edge* eTemp;
 	edge* listHead;
 
-	// krok 0 tworzymy 1 kradzêdŸ z dwoma wierzcho³kami
+	// krok 0 tworzymy 1 kradzÄ™dÅº z dwoma wierzchoÅ‚kami
 	e1 = malloc(sizeof(edge));
 	if (e1 == NULL)
 		return;
@@ -792,10 +768,10 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 	e1->v2index = 1;
 	e1->new = true;
 	e1->next = NULL;
-	// uzupe³niamy macierz s¹siedztwa
+	// uzupeÅ‚niamy macierz sÄ…siedztwa
 	adjacencyMatrix[0][1] = 1;
 	adjacencyMatrix[1][0] = 1;
-	// krawêd¿ na pocz¹tek listy
+	// krawÄ™dÅ¼ na poczÄ…tek listy
 	listHead = e1;
 
 	// krok > 0
@@ -807,24 +783,24 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 	{
 		eTemp = listHead;
 
-		while (eTemp && eTemp->new)  // dopóki mamy wierzcho³ki w liœcie i s¹ one nowe (nowe w poprzednik kroku)
+		while (eTemp && eTemp->new)  // dopÃ³ki mamy wierzchoÅ‚ki w liÅ›cie i sÄ… one nowe (nowe w poprzednik kroku)
 		{
-			for (int i = 0; i < r; i++) // tyle dochodzi wierzcho³ków da jedn¹ krawêdŸ z poprzedniego kroku
+			for (int i = 0; i < r; i++) // tyle dochodzi wierzchoÅ‚kÃ³w da jednÄ… krawÄ™dÅº z poprzedniego kroku
 			{
-				// tworzymy now¹ krawêdŸ po³¹czon¹ z v1index poprzedniej krawêdzi i  z nowym wierzcho³kiem
+				// tworzymy nowÄ… krawÄ™dÅº poÅ‚Ä…czonÄ… z v1index poprzedniej krawÄ™dzi i  z nowym wierzchoÅ‚kiem
 				e1 = malloc(sizeof(edge));
-				e1->index = lastEdgeIndex + 1;  // wiem, ¿e mo¿na to zapisaæ ++lastEdge, ale tak jak jest, jest bardziej czytelnie
+				e1->index = lastEdgeIndex + 1;  // wiem, Å¼e moÅ¼na to zapisaÄ‡ ++lastEdge, ale tak jak jest, jest bardziej czytelnie
 				lastEdgeIndex++;
 				e1->v1index = eTemp->v1index;
-				e1->v2index = lastVertexIndex + 1; // nowy wierzcho³ek
+				e1->v2index = lastVertexIndex + 1; // nowy wierzchoÅ‚ek
 				lastVertexIndex++;
 				e1->new = true;
 				e1->next = NULL;
-				// uzupe³niamy macierz s¹siedztwa
+				// uzupeÅ‚niamy macierz sÄ…siedztwa
 				adjacencyMatrix[e1->v1index][e1->v2index] = 1;
 				adjacencyMatrix[e1->v2index][e1->v1index] = 1;
 
-				// druga krawêdŸ (e1 i e2 maj¹ wspólny wierzcho³ek v2index) ³¹czymy z nowym wierzcho³kiem i v2index poprzedniej krawêdzi
+				// druga krawÄ™dÅº (e1 i e2 majÄ… wspÃ³lny wierzchoÅ‚ek v2index) Å‚Ä…czymy z nowym wierzchoÅ‚kiem i v2index poprzedniej krawÄ™dzi
 				e2 = malloc(sizeof(edge));
 				e2->index = lastEdgeIndex + 1;
 				lastEdgeIndex++;
@@ -832,17 +808,17 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 				e2->v2index = lastVertexIndex;
 				e2->new = true;
 				e2->next = NULL;
-				// uzupe³niamy macierz s¹siedztwa
+				// uzupeÅ‚niamy macierz sÄ…siedztwa
 				adjacencyMatrix[e2->v1index][e2->v2index] = 1;
 				adjacencyMatrix[e2->v2index][e2->v1index] = 1;
 
-				// nowe krawêdzie na pocz¹tek listy
+				// nowe krawÄ™dzie na poczÄ…tek listy
 				e1->next = listHead;
 				e2->next = e1;
 				listHead = e2;
 			}
 
-			// krawêdz, do której do³¹czylismy ju¿ komplet ju¿ nie jest nowa i przechodzimy do kolejnej
+			// krawÄ™dz, do ktÃ³rej doÅ‚Ä…czylismy juÅ¼ komplet juÅ¼ nie jest nowa i przechodzimy do kolejnej
 			eTemp->new = false;
 			eTemp = eTemp->next;
 		}
@@ -850,14 +826,14 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczaæ odleg³oœci n
 		prevStep++;
 	}
 
-	adjacencyLists = createAdjacencyLists();
-	matrixToList();
+	adjacencyLists = createAdjacencyLists(allVertex);
+	matrixToList(allVertex);
 
 	int distanceSum = countDistances();
 	printf("%i\n", distanceSum);
 
-	deleteMatrix(adjacencyMatrix);
-	deleteAdjacencyLists(adjacencyLists);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
 void DCN()
@@ -871,29 +847,29 @@ void DCN()
 	printf("liczba wierzcholkow = %i\n", allVertex);
 #endif // DEBUG
 
-	adjacencyMatrix = createMatrix();
-	adjacencyLists = createAdjacencyLists();
+	adjacencyMatrix = createMatrix(allVertex);
+	adjacencyLists = createAdjacencyLists(allVertex);
 	vertex* v;
 
 	// krok 0
-	// nowy wierzcho³ek - korzeñ
-	v = malloc(sizeof(vertex)); // wskaŸnik
+	// nowy wierzchoÅ‚ek - korzeÅ„
+	v = malloc(sizeof(vertex)); // wskaÅºnik
 	if (v == NULL)
 		return;
 	v->index = 0;
 	v->next = NULL;
 
-	// lista s¹siedztwa - v0 na razie brak s¹siadów, reszta - ka¿dy ma za s¹siada v0
+	// lista sÄ…siedztwa - v0 na razie brak sÄ…siadÃ³w, reszta - kaÅ¼dy ma za sÄ…siada v0
 	adjacencyLists[0] = NULL;
 	for (int i = 1; i < allVertex; i++)
 	{
 		adjacencyLists[i] = v;
 	}
 
-	// zliczenie odleg³oœci od ka¿dego po przodkach do v0 - póŸniej siê to przyda
-	//int* throughAncestors = (int*)calloc(allVertex, sizeof(int));
-	int throughAncestors[1022];
-	for (int i = 0; i < 1022; i++)
+	// zliczenie odlegÅ‚oÅ›ci od kaÅ¼dego po przodkach do v0 - pÃ³Åºniej siÄ™ to przyda
+	//int* throughAncestors = (int*)calloc(MAXVERTEXES, sizeof(int));
+	int throughAncestors[MAXVERTEXES];
+	for (int i = 0; i < MAXVERTEXES; i++)
 	{
 		throughAncestors[i] = 0;
 	}
@@ -930,14 +906,14 @@ void DCN()
 		v = adjacencyLists[i];
 		while (v)
 		{
-			adjacencyMatrix[i][v->index] = 1;  // na liscie to by³oby trudne...
+			adjacencyMatrix[i][v->index] = 1;  // na liscie to byÅ‚oby trudne...
 			adjacencyMatrix[v->index][i] = 1;
 			v = v->next;
 		}
 	}
 
 
-	// wyczyszczenie tymczasowej listy s¹siedztwa
+	// wyczyszczenie tymczasowej listy sÄ…siedztwa
 	for (int i = allVertex - 1; i > 0; i = i - 2)
 	{
 		v = adjacencyLists[i];
@@ -952,14 +928,14 @@ void DCN()
 	}
 
 
-	matrixToList();
+	matrixToList(allVertex);
 
 	int distanceSum = countDistances();
 	printf("%i\n", distanceSum);
 
 	//free(throughAncestors);
-	deleteMatrix(adjacencyMatrix);
-	deleteAdjacencyLists(adjacencyLists);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteAdjacencyLists(adjacencyLists, allVertex);
 }
 
 void GFG()
@@ -974,45 +950,255 @@ void Kronecker()
 #ifdef DEBUG
 	printf("Kronecker\n");
 #endif // DEBUG
+	// Silny produkt grafowy jest operacjÄ… binarnÄ… na grafach G1 i G2, ktÃ³ra daje w wyniku graf H o nastÄ™pujÄ…cych wÅ‚asnoÅ›ciach:
+	// - zbiÃ³r wierzchoÅ‚kÃ³w w grafie H jest iloczynem kartezjaÅ„skim V(G1) x V(G2), gdzie V(G1) i V(G2) sÄ… zbiorami wierzchoÅ‚kÃ³w
+	// - dwa wierzchoÅ‚ki (u1,u2) i (v1,v2) z H sÄ… poÅ‚Ä…czone krawÄ™dziÄ… <=> gdy wierzchoÅ‚ki u1,u2,v1,v2 speÅ‚niajÄ… pewne warunki dot. krawÄ™dzi w G1 i G2
+	// - warunek dot. krawÄ™dzi: u1 = v1 oraz u2v2 naleÅ¼y do E(G2) albo
+	//                          u1v1 naleÅ¼y do E(G1) oraz u2 = v2 albo
+	//                          u1v1 naleÅ¼y do E(G1) oraz u2v2 naleÅ¼y do E(G2)
 
+	int k = 0;  //potÄ™ga i zarazem liczba krokÃ³w
+	char buffor[100] = { 0 };
+	scanf_s("%i", &k);
+	scanf_s("%s", buffor, (unsigned)_countof(buffor));
+#ifdef DEBUG
+	printf("n = %i  buffor = %s\n", n, buffor);
+#endif // DEBUG
+	if (strlen(buffor) == 0)
+		return;
+	int startVertex = (int)sqrt(strlen(buffor));  // wejÅ›ciowa liczba wierzchoÅ‚kÃ³w
+#ifdef DEBUG
+	printf("Liczba wierzcholkow: %i\n", startVertex);
+#endif // DEBUG
+
+	short** G1 = createMatrix(startVertex);
+	short** G2 = createMatrix(startVertex);
+
+	// wczytujemy graf podany w postaci macierzy sÄ…siedztwa
+	// 2 razy, bo bÄ™dziemy tworzyÄ‡ silny produkt grafowy
+	int nchar = 0;
+	for (int i = 0; i < startVertex; ++i)
+	{
+		for (int j = 0; j < startVertex; ++j)
+		{
+			G1[i][j] = G2[i][j] = buffor[nchar++] - '0';
+		}
+	}
+#ifdef DEBUG
+	printMatrix(G1);
+#endif // DEBUG
+
+	short** H = NULL; // graf H - silny produkt
+
+	allVertex = startVertex;  // allVertex - koÅ„cowa liczba wierzchoÅ‚kÃ³w
+	for (int i = 1; i < k; i++)
+	{
+		allVertex *= startVertex;
+	}
+
+	int HVertex = startVertex;	// do Å›ledzenia iloÅ›ci wierzchoÅ‚kÃ³w w klejnych krokach (mnoÅ¼eniach), czyli iloÅ›Ä‡ wierzchoÅ‚kÃ³w grafu H - silnego produktu
+
+	while (HVertex < allVertex)
+	{
+		// jeÅ›li mamy kolejny krok (kolejne mnoÅ¼enie), to musimy zwolniÄ‡ poprzednÄ… wejÅ›ciowÄ… wersjÄ™ grafu
+		// i przypisaÄ‡ do niej graf H, by mÃ³c dalej mnoÅ¼yÄ‡ (kartezjaÅ„sko ofc)
+		if (H)
+		{
+			//deleteMatrix(G1, HVertex);  // problem ze zwalnianiem pamiÄ™ci?
+			G1 = H;
+		}
+
+		// tworzenie grafu H - silny produkt
+		HVertex *= startVertex; // nowa liczba wierzchoÅ‚kÃ³w
+		H = createMatrix(HVertex);
+		// krawÄ™dzie na podstawie trzech warunkÃ³w
+		int u1 = 0;
+		int v1 = 0;
+		int u2 = 0;
+		int v2 = 0;
+		for (int i = 0; i < HVertex; i++)
+		{
+			for (int j = 0; j < HVertex; j++)
+			{
+				// wierzchoÅ‚ek i (u1,u2), wierzchoÅ‚ek j (v1,v2)
+				u1 = i / startVertex;
+				v1 = j / startVertex;
+				u2 = i % startVertex;
+				v2 = j % startVertex;
+				    
+				    // u1 = v1 oraz u2v2 naleÅ¼y do E(G2) albo
+				if (((u1 == v1) && (G2[u2][v2])) ||
+					// u1v1 naleÅ¼y do E(G1) oraz u2 = v2 albo
+					((G1[u1][v1]) && (u2 == v2)) ||
+					// u1v1 naleÅ¼y do E(G1) oraz u2v2 naleÅ¼y do E(G2)
+					((G1[u1][v1] == 1) && (G2[u2][v2] == 1)))
+				{
+					H[i][j] = 1;
+				}
+			}
+		}
+	}
+
+	if (H == NULL)  // przypadek, gdy potÄ™ga = 1
+	{
+		H = G1;
+	}
+
+	// liczenie odlegÅ‚oÅ›ci
+	// ð‘‘ðº1âŠ ðº2(ð‘¥, ð‘¦) = ð‘šð‘Žð‘¥{ ð‘‘ðº1(ð‘¥1, ð‘¦1), ð‘‘ðº2(ð‘¥2, ð‘¦2) }
+	// czyli potrzebujemy policzyÄ‡ odlegÅ‚oÅ›ci w grafach G1 i G2 (przy k > 2 G1 juÅ¼ jest silnym produktem)
+	int** distancesMatrix;
+	adjacencyMatrix = G2;
+	adjacencyLists = createAdjacencyLists(startVertex);
+	matrixToList(startVertex);
+	distancesMatrix = countDistancesReturnMatrix(startVertex);
+
+	int distancesSum = 0;
+
+	if (k == 1) // tu tylko zliczamy z macierzy odlegÅ‚oÅ›ci
+	{
+		for (int i = 0; i < startVertex; i++)
+		{
+			for (int j = i; j < startVertex; j++)
+			{
+				distancesSum += distancesMatrix[i][j];
+			}
+		}
+	}
+	else if (k > 1) // tu dla silnego produktu
+	{
+		for (int i = 0; i < HVertex; i++)
+		{
+			for (int j = i; j < HVertex; j++)
+			{
+				distancesSum += distanceOfStrongProductDigraphs(distancesMatrix, startVertex, i, j, k);
+			}
+		}
+	}
+
+	printf("%i\n", distancesSum);
+
+	deleteMatrix(H, HVertex);
+	deleteMatrix(G2, startVertex);
+	deleteMatrixInt(distancesMatrix, startVertex);
+	deleteAdjacencyLists(adjacencyLists, startVertex);
 }
 
-short** createMatrix()
+// ð‘‘ðº1âŠ ðº2(ð‘¥, ð‘¦) = ð‘šð‘Žð‘¥{ ð‘‘ðº1(ð‘¥1, ð‘¦1), ð‘‘ðº2(ð‘¥2, ð‘¦2) }
+// ð‘‘ðº1âŠ ðº2(g1, g2) = ð‘šð‘Žð‘¥{ ð‘‘ðº1(u1, u2), ð‘‘ðº2(v1, v2) }
+// rekurencja!
+// czego potrzebujemy na wejÅ›ciu:
+// - dostÄ™p do macierzy odlegÅ‚oÅ›ci
+// - liczba krokÃ³w
+// - wierzchoÅ‚ek i (u1,u2), wierzchoÅ‚ek j (v1,v2)
+//u1 = i / startVertex;
+//v1 = j / startVertex;
+//u2 = i % startVertex;
+//v2 = j % startVertex;
+int distanceOfStrongProductDigraphs(int** matrix, int n, int i, int j, int k)
 {
-	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
+	int u1 = i / n; //a1
+	int v1 = j / n; //a2
+	int u2 = i % n; //b1
+	int v2 = j % n; //b2
+
+	// warunek wyjÅ›cia - gdy mamy 2 zwykÅ‚e grafy, a jeszcze Å¼adnego silnego produktu
+	if (k == 2)
+	{
+		if ((matrix[u1][v1]) > (matrix[u2][v2]))
+		{
+			return matrix[u1][v1];
+		}
+		else
+		{
+			return matrix[u2][v2];
+		}
+	}
+	else
+	{
+		int dist1 = distanceOfStrongProductDigraphs(matrix, n, u1, v1, k - 1);
+		int dist2 = distanceOfStrongProductDigraphs(matrix, n, u2, v2, k - 1);
+		if (dist1 > dist2)
+		{
+			return dist1;
+		}
+		else
+		{
+			return dist2;
+		}
+	}
+}
+
+//short** createMatrix()
+//{
+//	short** matrix = (short**)calloc(allVertex, sizeof(short*));   // calloc od razu inicjalizuje 0
+//	if (matrix != NULL)
+//	{
+//		for (int i = 0; i < allVertex; ++i)
+//			matrix[i] = (short*)calloc(allVertex, sizeof(short));
+//	}
+//
+//	return matrix;
+//}
+
+short** createMatrix(int n)
+{
+	short** matrix = (short**)calloc(n, sizeof(short*));   // calloc od razu inicjalizuje 0
 	if (matrix != NULL)
 	{
-		for (int i = 0; i < allVertex; ++i)
-			matrix[i] = (short*)calloc(allVertex, sizeof(short));
+		for (int i = 0; i < n; ++i)
+			matrix[i] = (short*)calloc(n, sizeof(short));
 	}
 
 	return matrix;
 }
 
-void deleteMatrix(short** matrix)
+void deleteMatrix(short** matrix, int n)
 {
 	if (matrix != NULL)
 	{
-		for (int i = 0; i < allVertex; ++i)
+		for (int i = 0; i < n; ++i)
+			free(matrix[i]);
+		free(matrix);
+	}
+}
+
+int** createMatrixInt(int n)
+{
+	int** matrix = (int**)calloc(n, sizeof(int*));   // calloc od razu inicjalizuje 0
+	if (matrix != NULL)
+	{
+		for (int i = 0; i < n; ++i)
+			matrix[i] = (int*)calloc(n, sizeof(int));
+	}
+
+	return matrix;
+}
+
+void deleteMatrixInt(int** matrix, int n)
+{
+	if (matrix != NULL)
+	{
+		for (int i = 0; i < n; ++i)
 			free(matrix[i]);
 		free(matrix);
 	}
 }
 
 
-vertex** createAdjacencyLists()
+vertex** createAdjacencyLists(int n)
 {
-	vertex**  adjcLists = (vertex**)calloc(allVertex, sizeof(vertex*));
+	vertex**  adjcLists = (vertex**)calloc(n, sizeof(vertex*));
 	return adjcLists;
 }
 
-void deleteAdjacencyLists(vertex** adjcLists)
+void deleteAdjacencyLists(vertex** adjcLists, int n)
 {
 	if (adjcLists != NULL)
 	{
 		vertex* v;
 		vertex* vDelete;
-		for (int i = 0; i < allVertex; i++)
+		for (int i = 0; i < n; i++)
 		{
 			v = adjacencyLists[i];
 			while (v)
@@ -1022,7 +1208,7 @@ void deleteAdjacencyLists(vertex** adjcLists)
 				free(vDelete);
 			}
 		}
-		//free(adjcLists);  // ju¿ wy¿ej zwolniliœmy wskaŸniki, które s¹ bezpoœrednio w tablicy
+		//free(adjcLists);  // juÅ¼ wyÅ¼ej zwolniliÅ›my wskaÅºniki, ktÃ³re sÄ… bezpoÅ›rednio w tablicy
 	}
 }
 
@@ -1072,7 +1258,7 @@ void Floyd_Warshall(short** distanceMatrix)
 		}
 	}
 
-	//result /= 2; // nasz graf nie jest kierunkowy, wiêc algorytm ka¿d¹ krawêdŸ liczy jak dwie w dwóch kierunkach, dlatego wynik trzeb apodzieliæ na 2
+	//result /= 2; // nasz graf nie jest kierunkowy, wiÄ™c algorytm kaÅ¼dÄ… krawÄ™dÅº liczy jak dwie w dwÃ³ch kierunkach, dlatego wynik trzeb apodzieliÄ‡ na 2
 
 #ifdef DEBUG
 	printf("Result = %i\n", result);
@@ -1111,16 +1297,16 @@ void coutTempDistancesInMatrix(int lastIndex, int index1, int index2)
 	}
 }
 
-// zamiana macierzy s¹siedztwa na listê
-void matrixToList() 
+// zamiana macierzy sÄ…siedztwa na listÄ™
+void matrixToList(int n) 
 {
 #ifdef DEBUG
 	printMatrix(adjacencyMatrix);
 #endif // DEBUG
 
-	for (int i = allVertex - 1; i >= 0; i--) 
+	for (int i = n - 1; i >= 0; i--) 
 	{
-		for (int j = allVertex - 1; j >= 0; j--) 
+		for (int j = n - 1; j >= 0; j--) 
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
@@ -1140,16 +1326,43 @@ void matrixToList()
 
 }
 
+int** countDistancesReturnMatrix(int n)
+{
+	int** distancesMatrix = createMatrixInt(n);
+	for (int v = 0; v < n; v++)
+	{
+		// suma odleglosci miÄ™dzy wierzchoÅ‚kiem v a pozostaÅ‚ymi (kolejnymi, unikamy tu powrÃ³rnego liczenia odlegÅ‚oÅ›ci w drugÄ… str)
+		BFSvertex* sum = BFS(v, allVertex);
+		for (int i = v; i < n; i++)
+		{
+			//i sumuje te odlegÅ‚oÅ›ci i wpisujemy w macierz
+			distancesMatrix[v][i] += sum[i].distance;
+
+		}
+		free(sum);
+	}
+	// uwaga! po BFS mamy macierz poÅ‚Ã³wkowÄ…!
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = i; j < n; j++)
+		{
+			distancesMatrix[j][i] = distancesMatrix[i][j];
+		}
+	}
+
+	return distancesMatrix;
+}
+
 int countDistances()
 {
 	int distanceSum = 0;
 	for (int v = 0; v < allVertex; v++)
 	{
-		// suma odleglosci miêdzy wierzcho³kiem v a pozosta³ymi (kolejnymi, unikamy tu powrórnego liczenia odleg³oœci w drug¹ str)
-		BFSvertex* sum = BFS(v);
+		// suma odleglosci miÄ™dzy wierzchoÅ‚kiem v a pozostaÅ‚ymi (kolejnymi, unikamy tu powrÃ³rnego liczenia odlegÅ‚oÅ›ci w drugÄ… str)
+		BFSvertex* sum = BFS(v, allVertex);
 		for (int i = v; i < allVertex; i++)
 		{
-			//i sumuje te odleg³oœci
+			//i sumuje te odlegÅ‚oÅ›ci
 			distanceSum += sum[i].distance;
 
 		}
@@ -1158,15 +1371,15 @@ int countDistances()
 	return distanceSum;
 }
 
-BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
+BFSvertex* BFS(int start, int n) // tu wrzucamy listÄ™ sÄ…siedztwa
 {
 	vertex* v;
-	BFSvertex* tab = malloc(sizeof(BFSvertex) * allVertex);
+	BFSvertex* tab = malloc(sizeof(BFSvertex) * n);
 
 	if (tab == NULL)
 		return NULL;
 
-	for (int i = 0; i < allVertex; i++) 
+	for (int i = 0; i < n; i++) 
 	{
 		tab[i].distance = MAXVAL;
 		tab[i].visited = false;
@@ -1176,7 +1389,7 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 	tab[start].visited = true;
 
 
-	queue *q = createQueue();  // tworzymy kolejkê
+	queue *q = createQueue();  // tworzymy kolejkÄ™
 	enqueue(q, start);	
 	while (!emptyQ(q)) 
 	{
@@ -1205,7 +1418,7 @@ BFSvertex* BFS(int start) // tu wrzucamy listê s¹siedztwa
 #ifdef DEBUG
 void matrixForTest()
 {
-	// dla wejœcia: 1 6 | wyjscie: 20
+	// dla wejÅ›cia: 1 6 | wyjscie: 20
 	allVertex = 6;
 	adjacencyMatrix = createMatrix();
 	indexMatrix = createMatrix();
