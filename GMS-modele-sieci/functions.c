@@ -10,6 +10,7 @@ void getModel(int model)
 	case 0:
 		//Barabasi_Ravasz_Vicsek();
 		Barabasi_Ravasz_Vicsek_v2();
+		//Barabasi_Ravasz_Vicsek_v3();
 		break;
 	case 1:
 		//Lu_Su_Guo();
@@ -36,7 +37,7 @@ void getModel(int model)
 	}
 }
 
-void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z poprzedniego kroku
+void Barabasi_Ravasz_Vicsek_v3() // zmiana sposobu budowania grafu - wciąż do macierzy sąsiedztwa, ale za pomocą tymczasowych list
 {
 #ifdef DEBUG
 	printf("Barabasi-Ravasz-Vicsek\n");
@@ -48,6 +49,169 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 	printf("k = %i\n", k);
 #endif // DEBUG
 	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
+							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
+
+	allVertex = 1; // węzeł w kroku 0
+
+	// LICZBA WIERZCHOŁKÓW 
+	if (k > 0)
+	{
+		for (int i = 0; i < k; i++)
+			allVertex = allVertex * 3;
+	}
+#ifdef DEBUG
+	printf("Liczba wierzcholkow: %i\n", allVertex);
+#endif // DEBUG
+
+
+	adjacencyMatrix = createMatrix(allVertex);
+
+	// zbudować graf --> macierz sąsiedztwa
+	// jeśli jest krawedz: macierzSasiedztwa[i][j] = 1
+
+	// krok 0
+	//short i = 0;
+	//short j = 0;
+	adjacencyLists = createAdjacencyLists(allVertex);
+	vertex** tempAdjacencyLists1;
+	vertex** tempAdjacencyLists2;
+	vertex* v1;
+	vertex* v2;
+	vertex* v3;
+	vertex* v4;
+
+	// krok 1 - twoezymy 2 wierzchołki i łączymy z korzeniem
+	if (k > 0)
+	{
+		v1 = malloc(sizeof(vertex));
+		v1->index = 0;   // to nie index wierzchołka, tylko tymczasowa numeracja potrzebna do budowania grafu
+		v1->new = true;  // zeby nie rozbudowywać strukta użyjemy new do okreśnenia, czy to dolny wierzchołek
+		v1->next = adjacencyLists[1]; // a nie lepiej null?
+		adjacencyLists[1] = v1;
+
+		v1 = malloc(sizeof(vertex));
+		v1->index = 0;
+		v1->new = true;
+		v1->next = adjacencyLists[2];
+		adjacencyLists[2] = v1;
+
+	}
+
+	// krok >=2
+	if (k > 1)
+	{
+		short tempVertex = 3; // tyle mamy po 1 kroku
+
+		while (tempVertex < allVertex)
+		{
+			tempAdjacencyLists1 = createAdjacencyLists(tempVertex);
+			tempAdjacencyLists2 = createAdjacencyLists(tempVertex);
+
+			for (int i = 0; i < tempVertex; i++)
+			{
+				v1 = adjacencyLists[i];
+				v2 = tempAdjacencyLists1[i];
+				v3 = tempAdjacencyLists2[i];
+
+				while (v1)
+				{
+					v2 = malloc(sizeof(vertex));
+					v2->index = v1->index + tempVertex;
+					v2->new = false;
+					v2->next = tempAdjacencyLists1[i];
+					tempAdjacencyLists1[i] = v2;
+
+					if (v1->new == true)
+					{
+						v4 = malloc(sizeof(vertex));
+						v4->index = 0;
+						v4->new = true;
+						v4->next = tempAdjacencyLists1[i];
+						tempAdjacencyLists1[i] = v4;
+					}
+
+					v3 = malloc(sizeof(vertex));
+					v3->index = v1->index + 2 * tempVertex;
+					v3->new = false;
+					v3->next = tempAdjacencyLists2[i];
+					tempAdjacencyLists2[i] = v3;
+
+					if (v1->new == true)
+					{
+						v4 = malloc(sizeof(vertex));
+						v4->index = 0;
+						v4->new = true;
+						v4->next = tempAdjacencyLists2[i];
+						tempAdjacencyLists2[i] = v4;
+						v1->new = false;
+					}
+
+					v1 = v1->next; //przechodzimy do kolejnego wierzchołka
+
+				}
+				// tymczasowe listy do głównej
+				adjacencyLists[i + tempVertex] = tempAdjacencyLists1[i];
+				adjacencyLists[i + 2 * tempVertex] = tempAdjacencyLists2[i];
+			}
+
+			free(tempAdjacencyLists1);
+			free(tempAdjacencyLists2);
+			//deleteAdjacencyLists(tempAdjacencyLists1, tempVertex);
+			//deleteAdjacencyLists(tempAdjacencyLists2, tempVertex);
+
+			tempVertex *= 3;
+		}
+
+		// kopiowanie do macierzy sąsiedztwa (połówkowa)
+		for (int i = 0; i < allVertex; i++)
+		{
+			v1 = adjacencyLists[i];
+			while (v1)
+			{
+				adjacencyMatrix[i][v1->index] = 1;
+				v1 = v1->next;
+			}
+		}
+		// dopełnienie maicerzy
+		for (int i = 0; i < allVertex; i++)
+		{
+			for (int j = 0; j < allVertex; j++)
+			{
+				if (adjacencyMatrix[i][j] == 1)
+				{
+					adjacencyMatrix[j][i] = 1;
+				}
+			}
+		}
+
+		deleteAdjacencyLists(adjacencyLists, allVertex);
+		adjacencyLists = createAdjacencyLists(allVertex);
+		matrixToList(allVertex);
+
+		int distanceSum = 0;
+		distanceSum = countDistances();
+
+		printf("%i\n", distanceSum);
+
+
+		deleteMatrix(adjacencyMatrix, allVertex);
+		deleteAdjacencyLists(adjacencyLists, allVertex);
+	}
+}
+
+
+void Barabasi_Ravasz_Vicsek_v2() 
+{
+#ifdef DEBUG
+	printf("Barabasi-Ravasz-Vicsek\n");
+#endif // DEBUG
+
+	int k = 0;
+	scanf_s("%i", &k);
+#ifdef DEBUG
+	printf("k = %i\n", k);
+#endif // DEBUG
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // węzeł w kroku 0

@@ -50,6 +50,7 @@ void getModel(int model);
 
 void Barabasi_Ravasz_Vicsek();
 void Barabasi_Ravasz_Vicsek_v2();
+void Barabasi_Ravasz_Vicsek_v3();
 void Lu_Su_Guo();
 void Lu_Su_Guo_v2();
 void Simplical();
