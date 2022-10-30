@@ -3,6 +3,12 @@
 //#include <string.h>
 #include "functions.h"
 
+int allVertex;
+short** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
+short** indexMatrix;						// identyfikatory przedostatnich punktów na ścieżce łączącej punkty - do F-W
+vertex** adjacencyLists;	// tablica list sąsiedztwa (tablica wskaźników)
+
+
 void getModel(int model)
 {
 	switch (model)
@@ -47,7 +53,7 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // węzeł w kroku 0
@@ -348,29 +354,29 @@ void Lu_Su_Guo_v2()
 	{
 		// krok 0
 		// nowy wierzchołek - korzeń
-		v1 = malloc(sizeof(vertex)); // wskaźnik
+		v1 = (vertex*)malloc(sizeof(vertex)); // wskaźnik
 		if (v1 == NULL)
 			return;
 		v1->index = 0;
-		v1->new = false; // bo to korzeń
+		v1->isnew = false; // bo to korzeń
 
 		listHead = v1; // głowa listy
 
 		// krok 1
 
-		v2 = malloc(sizeof(vertex));
+		v2 = (vertex*)malloc(sizeof(vertex));
 		if (v2 == NULL)
 			return;
 		v2->index = 2;	
-		v2->new = true;
+		v2->isnew = true;
 		v2->next = listHead;	// head to v1 next w v2 wskazuje na v1
 		listHead = v2;			// head teraz to v2
 
-		v3 = malloc(sizeof(vertex));
+		v3 = (vertex*)malloc(sizeof(vertex));
 		if (v3 == NULL)
 			return;
 		v3->index = 1;
-		v3->new = true;
+		v3->isnew = true;
 		v3->next = listHead;		//next node3 o id 1 wskazuje na node2 o id 2
 		listHead = v3;
 
@@ -404,14 +410,14 @@ void Lu_Su_Guo_v2()
 
 			stack* s = createStack();  // na stosie będą nowe wierzchołki
 
-			while (vTemp && vTemp->new == true && vertexCounter < allVertex)
+			while (vTemp && vTemp->isnew == true && vertexCounter < allVertex)
 			{
 				// tworzymy nowy wierzchołek i wrzucamy go na stos
-				v1 = malloc(sizeof(vertex));
+				v1 = (vertex*)malloc(sizeof(vertex));
 				if (v1 == NULL)
 					return;
 				v1->index = vertexCounter;
-				v1->new = true;
+				v1->isnew = true;
 				v1->next = NULL;
 				vertexCounter++;
 				push(s, v1); // wrzucamy na stos
@@ -428,11 +434,11 @@ void Lu_Su_Guo_v2()
 				if (vertexCounter < allVertex) // spr czy dodajemy drugi wierzchołek
 				{
 					// tworzymy nowy wierzchołek i wrzucamy go na stos
-					v2 = malloc(sizeof(vertex));
+					v2 = (vertex*)malloc(sizeof(vertex));
 					if (v2 == NULL)
 						return;
 					v2->index = vertexCounter;
-					v2->new = true;
+					v2->isnew = true;
 					v2->next = NULL;
 					vertexCounter++;
 					push(s, v2);
@@ -452,7 +458,7 @@ void Lu_Su_Guo_v2()
 
 
 				}
-				vTemp->new = false;
+				vTemp->isnew = false;
 				vTemp = vTemp->next;  // przechodzimy do kolejnego
 			}
 			k++;
@@ -646,13 +652,13 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejście -> zliczanie odległości n
 	edge* listHead;
 
 	// krok 0 tworzymy 1 kradzędź z dwoma wierzchołkami
-	e1 = malloc(sizeof(edge));
+	e1 = (edge*)malloc(sizeof(edge));
 	if (e1 == NULL)
 		return;
 	e1->index = 0;
 	e1->v1index = 0;
 	e1->v2index = 1;
-	e1->new = true;
+	e1->isnew = true;
 	e1->next = NULL;
 	// uzupełniamy macierz sąsiedztwa
 	adjacencyMatrix[0][1] = 1;
@@ -669,18 +675,18 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejście -> zliczanie odległości n
 	{
 		eTemp = listHead;
 
-		while (eTemp && eTemp->new)  // dopóki mamy wierzchołki w liście i są one nowe (nowe w poprzednik kroku)
+		while (eTemp && eTemp->isnew)  // dopóki mamy wierzchołki w liście i są one nowe (nowe w poprzednik kroku)
 		{
 			for (int i = 0; i < r; i++) // tyle dochodzi wierzchołków da jedną krawędź z poprzedniego kroku
 			{
 				// tworzymy nową krawędź połączoną z v1index poprzedniej krawędzi i  z nowym wierzchołkiem
-				e1 = malloc(sizeof(edge));
+				e1 = (edge*)malloc(sizeof(edge));
 				e1->index = lastEdgeIndex + 1;  // wiem, że można to zapisać ++lastEdge, ale tak jak jest, jest bardziej czytelnie
 				lastEdgeIndex++;
 				e1->v1index = eTemp->v1index;
 				e1->v2index = lastVertexIndex + 1; // nowy wierzchołek
 				lastVertexIndex++;
-				e1->new = true;
+				e1->isnew = true;
 				e1->next = NULL;
 				// uzupełniamy macierz sąsiedztwa
 				adjacencyMatrix[e1->v1index][e1->v2index] = 1;
@@ -689,12 +695,12 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejście -> zliczanie odległości n
 				coutTempDistancesInMatrix(lastVertexIndex, e1->v1index, e1->v2index);
 
 				// druga krawędź (e1 i e2 mają wspólny wierzchołek v2index) łączymy z nowym wierzchołkiem i v2index poprzedniej krawędzi
-				e2 = malloc(sizeof(edge));
+				e2 = (edge*)malloc(sizeof(edge));
 				e2->index = lastEdgeIndex + 1;
 				lastEdgeIndex++;
 				e2->v1index = eTemp->v2index;
 				e2->v2index = lastVertexIndex;
-				e2->new = true;
+				e2->isnew = true;
 				e2->next = NULL;
 				// uzupełniamy macierz sąsiedztwa
 				adjacencyMatrix[e2->v1index][e2->v2index] = 1;
@@ -709,7 +715,7 @@ void Wzrostowo_iteracyjny_v2()  // drugie podejście -> zliczanie odległości n
 			}
 
 			// krawędz, do której dołączylismy już komplet już nie jest nowa i przechodzimy do kolejnej
-			eTemp->new = false;
+			eTemp->isnew = false;
 			eTemp = eTemp->next;
 		}
 
@@ -760,13 +766,13 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczać odległośc
 	edge* listHead;
 
 	// krok 0 tworzymy 1 kradzędź z dwoma wierzchołkami
-	e1 = malloc(sizeof(edge));
+	e1 = (edge*)malloc(sizeof(edge));
 	if (e1 == NULL)
 		return;
 	e1->index = 0;
 	e1->v1index = 0;
 	e1->v2index = 1;
-	e1->new = true;
+	e1->isnew = true;
 	e1->next = NULL;
 	// uzupełniamy macierz sąsiedztwa
 	adjacencyMatrix[0][1] = 1;
@@ -783,30 +789,30 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczać odległośc
 	{
 		eTemp = listHead;
 
-		while (eTemp && eTemp->new)  // dopóki mamy wierzchołki w liście i są one nowe (nowe w poprzednik kroku)
+		while (eTemp && eTemp->isnew)  // dopóki mamy wierzchołki w liście i są one nowe (nowe w poprzednik kroku)
 		{
 			for (int i = 0; i < r; i++) // tyle dochodzi wierzchołków da jedną krawędź z poprzedniego kroku
 			{
 				// tworzymy nową krawędź połączoną z v1index poprzedniej krawędzi i  z nowym wierzchołkiem
-				e1 = malloc(sizeof(edge));
+				e1 = (edge*)malloc(sizeof(edge));
 				e1->index = lastEdgeIndex + 1;  // wiem, że można to zapisać ++lastEdge, ale tak jak jest, jest bardziej czytelnie
 				lastEdgeIndex++;
 				e1->v1index = eTemp->v1index;
 				e1->v2index = lastVertexIndex + 1; // nowy wierzchołek
 				lastVertexIndex++;
-				e1->new = true;
+				e1->isnew = true;
 				e1->next = NULL;
 				// uzupełniamy macierz sąsiedztwa
 				adjacencyMatrix[e1->v1index][e1->v2index] = 1;
 				adjacencyMatrix[e1->v2index][e1->v1index] = 1;
 
 				// druga krawędź (e1 i e2 mają wspólny wierzchołek v2index) łączymy z nowym wierzchołkiem i v2index poprzedniej krawędzi
-				e2 = malloc(sizeof(edge));
+				e2 = (edge*)malloc(sizeof(edge));
 				e2->index = lastEdgeIndex + 1;
 				lastEdgeIndex++;
 				e2->v1index = eTemp->v2index;
 				e2->v2index = lastVertexIndex;
-				e2->new = true;
+				e2->isnew = true;
 				e2->next = NULL;
 				// uzupełniamy macierz sąsiedztwa
 				adjacencyMatrix[e2->v1index][e2->v2index] = 1;
@@ -819,7 +825,7 @@ void Wzrostowo_iteracyjny()  // za wolne, trzeba inaczej -> zliczać odległośc
 			}
 
 			// krawędz, do której dołączylismy już komplet już nie jest nowa i przechodzimy do kolejnej
-			eTemp->new = false;
+			eTemp->isnew = false;
 			eTemp = eTemp->next;
 		}
 
@@ -853,7 +859,7 @@ void DCN()
 
 	// krok 0
 	// nowy wierzchołek - korzeń
-	v = malloc(sizeof(vertex)); // wskaźnik
+	v = (vertex*)malloc(sizeof(vertex)); // wskaźnik
 	if (v == NULL)
 		return;
 	v->index = 0;
@@ -891,7 +897,7 @@ void DCN()
 		int index = throughAncestors[i];
 		while (index != 0)
 		{
-			v = malloc(sizeof(vertex));
+			v = (vertex*)malloc(sizeof(vertex));
 			if (v == NULL)
 				break;
 			v->index = index;
@@ -1310,7 +1316,7 @@ void matrixToList(int n)
 		{
 			if (adjacencyMatrix[i][j] == 1) 
 			{
-				vertex* v = malloc(sizeof(vertex));
+				vertex* v = (vertex*)malloc(sizeof(vertex));
 				if (v == NULL)
 					return;
 				v->index = j;
@@ -1373,15 +1379,16 @@ int countDistances()
 
 BFSvertex* BFS(int start, int n) // tu wrzucamy listę sąsiedztwa
 {
-	vertex* v;
-	BFSvertex* tab = malloc(sizeof(BFSvertex) * n);
+	vertex* currentVertex;
+	//BFSvertex* tab = (BFSvertex*)malloc(sizeof(BFSvertex) * n);
+	BFSvertex* tab = new BFSvertex[n];
 
 	if (tab == NULL)
 		return NULL;
 
 	for (int i = 0; i < n; i++) 
 	{
-		tab[i].distance = MAXVAL;
+		tab[i].distance = 0;
 		tab[i].visited = false;
 	}
 	
@@ -1389,25 +1396,31 @@ BFSvertex* BFS(int start, int n) // tu wrzucamy listę sąsiedztwa
 	tab[start].visited = true;
 
 
-	queue *q = createQueue();  // tworzymy kolejkę
-	enqueue(q, start);	
-	while (!emptyQ(q)) 
+	//queue *q = createQueue();  // tworzymy kolejkę
+	//enqueue(q, start);	
+	std::queue<int> q;
+	q.push(start);
+	//while (!emptyQ(q)) 
+	while (q.size() != 0)
 	{
-		int u = frontQ(q);
+		//int currentVertex = frontQ(q);
+		int currentVertexIndex = q.front();
 
-		dequeue(q);
-		v = adjacencyLists[u];
+		//dequeue(q);
+		q.pop();
+		currentVertex = adjacencyLists[currentVertexIndex];
 
-		while (v) 
+		while (currentVertex)
 		{
-			if ((v->index != u) && (tab[v->index].visited == false)) 
+			if ((currentVertex->index != currentVertexIndex) && (tab[currentVertex->index].visited == false))
 			{
-				tab[v->index].distance = tab[u].distance + 1;
-				tab[v->index].visited = true;
+				tab[currentVertex->index].distance = tab[currentVertexIndex].distance + 1;
+				tab[currentVertex->index].visited = true;
 
-				enqueue(q, v->index);
+				//enqueue(q, currentVertex->index);
+				q.push(currentVertex->index);
 			}
-			v = v->next;
+			currentVertex = currentVertex->next;
 		}
 	}
 

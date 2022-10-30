@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include "functions.h"
-#include "queue.h"
-//#include "stack.h"
+#include "main.h"
 
 /* Ewelina Walkusz 101645
  * 
@@ -43,27 +37,27 @@ int main()
 	int retval = 0;
 
 
-	//while (retval = scanf_s("%i", &noOfModel)) //scanf - may be unsafe // EOL == Ctrl+D, Enter  (lub Ctr+Z)
-	//{
-	//	if (retval == EOF)
-	//		break;
-	//	getchar(); // spacja
-
-
-	//	getModel(noOfModel);
-	//}
-
-	do
+	while (retval = scanf_s("%i", &noOfModel)) //scanf - may be unsafe // EOL == Ctrl+D, Enter  (lub Ctr+Z)
 	{
-		retval = scanf_s("%i", &noOfModel);
-
 		if (retval == EOF)
 			break;
 		getchar(); // spacja
 
+
 		getModel(noOfModel);
-}
-	while (retval);
+	}
+
+//	do
+//	{
+//		retval = scanf_s("%i", &noOfModel);
+//
+//		if (retval == EOF)
+//			break;
+//		getchar(); // spacja
+//
+//		getModel(noOfModel);
+//}
+//	while (retval);
 
 #ifdef DEBUG
 	printf("Bye!\n");

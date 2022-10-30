@@ -6,12 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "queue.h"
+#include <queue>
+//#include "queue.h"
 #include "stack.h"
-
-int allVertex;
-short** adjacencyMatrix;					// ktora na poczatku jest zwykla macieza sasiedztwa
-short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹cz¹cej punkty - do F-W
 
 
 #define MAXVAL  SHRT_MAX / 3  // imituje nieskonczonosc w algorytmie
@@ -21,8 +18,8 @@ short** indexMatrix;						// identyfikatory przedostatnich punktów na œcie¿ce ³¹
 
 typedef struct _vertex 
 {
-	int index;							// indeks wierzcho³ka
-	bool new;							// czy wierzcho³ek jest nowy?
+	unsigned short index;							// indeks wierzcho³ka
+	bool isnew;							// czy wierzcho³ek jest nowy?
 	struct _vertex* next;						// wskaŸnik na nastêpny wierzcho³ek w liœcie s¹siedztwa
 }vertex;
 
@@ -31,7 +28,7 @@ typedef struct _edge
 	int index;
 	int v1index;
 	int v2index;
-	bool new;
+	bool isnew;
 	struct _edge* next;
 } edge;
 
@@ -44,7 +41,6 @@ typedef struct _BFSvertex
 }BFSvertex;
 
 
-vertex** adjacencyLists;	// tablica list s¹siedztwa (tablica wskaŸników)
 
 void getModel(int model);
 
