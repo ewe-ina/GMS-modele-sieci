@@ -76,8 +76,10 @@ void Floyd_Warshall(short** distanceMatrix);
 void coutTempDistancesInMatrix(int lastIndex, int index1, int index2);  // do wzrostowo-iteracyjnego
 
 void matrixToList(int n);
+void matrixToList2(int n, int s);
 
 int countDistances();
+int countDistances2(int n, int s);
 BFSvertex* BFS(int start, int n);
 
 int** countDistancesReturnMatrix(int n); // zwraca macierz odleg³oœci, do Knockera

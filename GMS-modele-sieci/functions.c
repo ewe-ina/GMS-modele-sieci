@@ -47,7 +47,7 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 #ifdef DEBUG
 	printf("k = %i\n", k);
 #endif // DEBUG
-	if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
+	//if (k > 7) return;  // BEZPIECZNIK !!! przy k==8 na STOSie exception ACCESS_VIOLATION przy wypełnianiu (a nie wychodzimy indeksami poza zakres!)
 							// malloc przyc=dzielil za malo pamieci - zmiana int na short pomogla, ale wciaz dziala za wolno dla k=8
 
 	allVertex = 1; // węzeł w kroku 0
@@ -96,6 +96,10 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 		}
 		copyVertex = 3;
 	}
+
+	adjacencyLists = createAdjacencyLists(allVertex);
+	int distanceSum = 2;
+
 
 	// krok >=2
 	if (k > 1)
@@ -155,20 +159,22 @@ void Barabasi_Ravasz_Vicsek_v2() // można jeszcze zapamiętywać macierz z popr
 			// dolne z korzeniem - DONE WYZEJ
 			// czyli te, które dołożone w poprzednim kroku były połączone z korzeniem, z przesunięciem o copyVertex i 2*copyVertex
 			// czyli zaczynami nie od 0, a od prevCopyIndex;
-
-
 			// na końcu pętli
 			prevCopyIndex = copyVertex;
 			copyVertex *= 3;
+
+			//matrixToList2(copyVertex, prevCopyIndex);
+			matrixToList(copyVertex);
+			distanceSum += countDistances2(copyVertex, prevCopyIndex);
+			
 		}
 	}
 
 	// przepisanie macierzy do list sąsiedztwa
-	adjacencyLists = createAdjacencyLists(allVertex);
-	matrixToList(allVertex);
+	//matrixToList(allVertex);
 
-	int distanceSum = 0;
-	distanceSum = countDistances();
+	//int distanceSum = 0;
+	//distanceSum = countDistances();
 
 	printf("%i\n", distanceSum);
 
@@ -962,7 +968,7 @@ void Kronecker()
 	scanf_s("%i", &k);
 	scanf_s("%s", buffor, (unsigned)_countof(buffor));
 #ifdef DEBUG
-	printf("n = %i  buffor = %s\n", n, buffor);
+	printf("k = %i  buffor = %s\n", k, buffor);
 #endif // DEBUG
 	if (strlen(buffor) == 0)
 		return;
@@ -1326,6 +1332,34 @@ void matrixToList(int n)
 
 }
 
+void matrixToList2(int n, int s)
+{
+#ifdef DEBUG
+	printMatrix(adjacencyMatrix);
+#endif // DEBUG
+
+	for (int i = n - 1; i > s; i--)
+	{
+		for (int j = i; j >= 0; j--)
+		{
+			if (adjacencyMatrix[i][j] == 1)
+			{
+				vertex* v = malloc(sizeof(vertex));
+				if (v == NULL)
+					return;
+				v->index = j;
+				//v->bottom = false;
+				v->next = adjacencyLists[i];
+				adjacencyLists[i] = v;
+			}
+		}
+	}
+#ifdef DEBUG
+	printAdjacencyList();
+#endif // DEBUG
+
+}
+
 int** countDistancesReturnMatrix(int n)
 {
 	int** distancesMatrix = createMatrixInt(n);
@@ -1370,6 +1404,25 @@ int countDistances()
 	}
 	return distanceSum;
 }
+
+int countDistances2(int n, int s)
+{
+	int distanceSum = 0;
+	for (int v = n - 1; v >= s; v--)
+	{
+		// suma odleglosci między wierzchołkiem v a pozostałymi (kolejnymi, unikamy tu powrórnego liczenia odległości w drugą str)
+		BFSvertex* sum = BFS(v, n);
+		for (int i = v; i < n; i++)
+		{
+			//i sumuje te odległości
+			distanceSum += sum[i].distance;
+
+		}
+		free(sum);
+	}
+	return distanceSum;
+}
+
 
 BFSvertex* BFS(int start, int n) // tu wrzucamy listę sąsiedztwa
 {
@@ -1420,8 +1473,8 @@ void matrixForTest()
 {
 	// dla wejścia: 1 6 | wyjscie: 20
 	allVertex = 6;
-	adjacencyMatrix = createMatrix();
-	indexMatrix = createMatrix();
+	adjacencyMatrix = createMatrix(allVertex);
+	indexMatrix = createMatrix(allVertex);
 
 	adjacencyMatrix[0][1] = 1;
 	adjacencyMatrix[0][2] = 1;
@@ -1476,8 +1529,8 @@ void matrixForTest()
 
 	Floyd_Warshall(adjacencyMatrix);
 
-	deleteMatrix(adjacencyMatrix);
-	deleteMatrix(indexMatrix);
+	deleteMatrix(adjacencyMatrix, allVertex);
+	deleteMatrix(indexMatrix, allVertex);
 }
 
 void printMatrix(short** matrix)
